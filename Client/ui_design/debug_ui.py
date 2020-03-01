@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
 from PyQt5 import QtCore
 from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
-from ui_finish import MainWindow, InfoWindow
+from ui_finish import MainWindow, InfoWindow, WarningWindow
+
 
 
 class ui(QMainWindow, Ui_MainWindow):
@@ -37,6 +38,8 @@ if __name__ == "__main__":
     win_.show()
     win = InfoWindow()
     win.show()
+    win1 = WarningWindow()
+    win1.show()
     sys.exit(app.exec_())
 
 "style sheet"
