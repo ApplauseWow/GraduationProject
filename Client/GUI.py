@@ -14,6 +14,7 @@ class SysHome(MainWindow):
 
     def __init__(self):
         super(SysHome, self).__init__()
+
         # 设置定时器
         self.timer_clock = QTimer()
         self.timer_clock.setInterval(1000)
@@ -25,6 +26,7 @@ class SysHome(MainWindow):
         更新时间
         :return:None
         """
+
         self.clock.display(time.strftime("%X", time.localtime()))
 
 
@@ -48,6 +50,15 @@ class Warning(WarningWindow):
         """
 
         self.close()
+
+
+class Register():
+    """
+    人脸注册窗口
+    """
+
+    def __init__(self):
+        super(Register, self).__init__()
 
 
 if __name__ == "__main__":

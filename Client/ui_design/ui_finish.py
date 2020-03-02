@@ -7,6 +7,7 @@ import time
 from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
 from warning_win import Ui_warning_win
+from register_win import Ui_register_win
 
 
 class DIYLabel(QLabel):
@@ -121,6 +122,65 @@ class WarningWindow(QDialog, Ui_warning_win):
         self.pix = QPixmap('./ui_design/warning.png').scaled(120, 120)  # 此路径在GUI加载时必须以GUI路径为当前路径，不是此文件
         self.warning.setPixmap(self.pix)
         self.words.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+        self.setAttribute(Qt.WA_TranslucentBackground)  # 窗体背景透明
+        self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口
+
+
+class RegisterWindow(QDialog, Ui_register_win):
+    """
+    人脸注册窗口二次设计
+    """
+
+    def __init__(self):
+        super(RegisterWindow, self).__init__()
+        self.setupUi(self)
+
+        # 获取桌面尺寸
+        desktop = QApplication.desktop()
+        desk_width = desktop.screenGeometry().width()
+        desk_height = desktop.screenGeometry().height()
+
+        # 移动窗口
+        self.move(int(desk_width*0.3), int(desk_height*0.3))
+
+        # 设置按钮样式
+        buttons = [self.bt_again, self.bt_cancel, self.bt_reg]
+        map(lambda x: x.setStyleSheet("QPushButton{"
+"                   background-color:rgba(255,165,0,80);"
+"                   border-style:outset;                  "
+"                   border-width:4px;                     "
+"                   border-radius:10px;                "
+"                   border-color:rgba(255,255,255,80);   "
+"                   font:bold 18px;                    "
+"                   color:rgba(0,0,0,100);                "
+"                   padding:6px;                       "
+"                   }"
+"                   QPushButton:pressed{"
+"                   background-color:rgba(255,165,0,200);"
+"                   border-color:rgba(255,255,255,30);"
+"                   border-style:inset;"
+"                   color:rgba(0,0,0,100);"
+"                   }"
+"                   QPushButton:hover{"
+"                   background-color:rgba(255,165,0,100);"
+"                   border-color:rgba(255,255,255,200);"
+"                   color:rgba(0,0,0,200);"
+"                   }"), buttons)
+
+        # 设置进度条
+        self.process.setStyleSheet("QProgressBar "
+                                   "{border: 2px solid rgba(255,165,0,255);"
+                                   "border-radius: 5px;"
+                                   "text-align: center;}"
+                                   "QProgressBar::chunk "
+                                   "{border: 1px solid rgba(255, 255, 255, 255);"
+                                   "border-radius:4px;"
+                                   "width: 15px;"
+                                   "background:rgba(255,165,0,150);}")
+        self.process.setMinimum(0)
+        self.process.setMaximum(100)
+        self.process.hide()
 
         self.setAttribute(Qt.WA_TranslucentBackground)  # 窗体背景透明
         self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口

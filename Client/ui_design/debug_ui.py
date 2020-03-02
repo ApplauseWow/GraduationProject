@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
 from PyQt5 import QtCore
 from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
-from ui_finish import MainWindow, InfoWindow, WarningWindow
+from ui_finish import MainWindow, InfoWindow, WarningWindow, RegisterWindow
 
 
 
@@ -34,12 +34,14 @@ class ui2(QDialog, Ui_id_info_win):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = MainWindow()
-    win_.show()
-    win = InfoWindow()
-    win.show()
-    win1 = WarningWindow()
-    win1.show()
+    # win_ = MainWindow()
+    # win_.show()
+    # win = InfoWindow()
+    # win.show()
+    # win1 = WarningWindow()
+    # win1.show()
+    win2 = RegisterWindow()
+    win2.show()
     sys.exit(app.exec_())
 
 "style sheet"
