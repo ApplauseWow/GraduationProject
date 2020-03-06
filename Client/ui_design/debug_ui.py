@@ -40,7 +40,7 @@ if __name__ == "__main__":
     # win.show()
     # win1 = WarningWindow()
     # win1.show()
-    win2 = RegisterWindow()
+    win2 = InfoWindow()
     win2.show()
     sys.exit(app.exec_())
 

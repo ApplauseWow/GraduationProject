@@ -95,7 +95,8 @@ class InfoWindow(Ui_id_info_win, QDialog):
                                       "                   border-color:rgba(255,255,255,30);   "
                                       "                   font:bold 18px;                    "
                                       "                   color:rgb(255,255,255);                "
-                                      "                   padding:6px;                       "
+                                      "                   padding:6px; "
+                                      "                   text-align: center;                      "
                                       "                   }"),labels)
 
         self.setAttribute(Qt.WA_TranslucentBackground)  # 窗体背景透明
