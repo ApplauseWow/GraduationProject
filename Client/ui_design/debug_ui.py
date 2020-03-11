@@ -1,10 +1,9 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QPushButton
 from PyQt5 import QtCore
 from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
-from ui_finish import MainWindow, InfoWindow, WarningWindow, RegisterWindow
-
+from ui_finish import MainWindow, InfoWindow, WarningWindow, RegisterWindow, ManageWindow
 
 
 class ui(QMainWindow, Ui_MainWindow):
@@ -40,8 +39,12 @@ if __name__ == "__main__":
     # win.show()
     # win1 = WarningWindow()
     # win1.show()
-    win2 = InfoWindow()
-    win2.show()
+    # win2 = RegisterWindow()
+    # win2.show()
+    # exec("bt_{} = QPushButton()".format("close"))
+    # print bt_close
+    win3 = ManageWindow(0)
+    win3.show()
     sys.exit(app.exec_())
 
 "style sheet"
