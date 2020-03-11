@@ -201,7 +201,14 @@ class ManageWindow(QDialog):
         self.left_layout = QGridLayout()
         self.right_page = QWidget()
         self.right_layout = QGridLayout()
-        self.setStyleSheet("background-color: black;")
+        self.setStyleSheet("background-color: #FF8C00;")
+        self.right_page.setStyleSheet('''color:#232C51;
+        background:white;
+        border-top:1px solid darkGray;
+        border-bottom:5px solid darkGray;
+        border-right:5px solid darkGray;
+        border-top-right-radius:10px;
+        border-bottom-right-radius:10px;''')
 
         # 左侧菜单按钮
         # --公共组
@@ -252,25 +259,25 @@ class ManageWindow(QDialog):
         for row, bt in enumerate(bts):  # 排列按钮
             self.left_layout.addWidget(bt, row, 0, 1, 3)  # 从row行0列开始占1行3列
             bt.setStyleSheet("QPushButton{"
-"                   background-color:rgba(255,165,0,255);"
+"                   background-color:rgba(255,255,255,255);"
 "                   border-style:outset;                  "
 "                   border-width:4px;                     "
-"                   border-radius:10px;                "
-"                   border-color:rgba(255,255,255,80);   "
-"                   font:bold 18px;                    "
-"                   color:rgba(0,0,0,100);                "
-"                   padding:6px;                       "
+"                   border-radius:20px;                "
+"                   border-color:rgba(255,255,255,255);   "
+"                   font:bold 23px;                    "
+"                   color:rgba(255,165,0,255);                "
+"                   padding:6px;                      "
 "                   }"
 "                   QPushButton:pressed{"
 "                   background-color:rgba(255,165,0,255);"
 "                   border-color:rgba(255,255,255,30);"
 "                   border-style:inset;"
-"                   color:rgba(0,0,0,100);"
+"                   color:rgba(255,255,255,255);"
 "                   }"
 "                   QPushButton:hover{"
 "                   background-color:rgba(255,165,0,255);"
-"                   border-color:rgba(255,255,255,200);"
-"                   color:rgba(0,0,0,200);"
+"                   border-color:rgba(255,255,255,255);"
+"                   color:rgba(255,255,255,255);"
 "                   }")
 
         self.setLayout(self.whole_layout)
