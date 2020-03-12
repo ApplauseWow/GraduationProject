@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QPushButton
 from PyQt5 import QtCore
 from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
-from ui_finish import MainWindow, InfoWindow, WarningWindow, RegisterWindow, ManageWindow
+from ui_finish import MainWindow, InfoWindow, WarningWindow, RegisterWindow, ManagementWindow
 
 
 class ui(QMainWindow, Ui_MainWindow):
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # win2.show()
     # exec("bt_{} = QPushButton()".format("close"))
     # print bt_close
-    win3 = ManageWindow(0)
+    win3 = ManagementWindow(201610414206, 1)
     win3.show()
     sys.exit(app.exec_())
 

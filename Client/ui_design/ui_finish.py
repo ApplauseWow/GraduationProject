@@ -188,13 +188,15 @@ class RegisterWindow(QDialog, Ui_register_win):
         self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口
 
 
-class ManageWindow(QDialog):
+class ManagementWindow(QDialog):
     """
     资源管理系统界面
     """
 
-    def __init__(self, user_type):
-        super(ManageWindow, self).__init__()
+    def __init__(self, user_id, user_type):
+        super(ManagementWindow, self).__init__()
+        self.user_id = user_id
+        self.user_type = user_type
         # 界面总体布局控件
         self.whole_layout = QGridLayout()
         self.left_menu = QWidget()
@@ -213,16 +215,16 @@ class ManageWindow(QDialog):
         # 左侧菜单按钮
         # --公共组
         self.bt_close = QPushButton(u"退出")
-        self.bt_note = QPushButton(u"公告管理" if user_type == 1 else u"查看公告")
-        self.bt_group = QPushButton(u"分组管理" if user_type == 1 else u"查看分组")
-        self.bt_source = QPushButton(u"资源管理" if user_type == 1 else u"查看资源")
+        self.bt_note = QPushButton(u"公告管理" if self.user_type == 1 else u"查看公告")
+        self.bt_group = QPushButton(u"分组管理" if self.user_type == 1 else u"查看分组")
+        self.bt_source = QPushButton(u"资源管理" if self.user_type == 1 else u"查看资源")
         self.bt_attendance = QPushButton(u"考勤统计")
-        self.bt_permit = QPushButton(u"假条审批" if user_type == 1 else u"假条管理")
-        self.bt_project = QPushButton(u"项目管理" if user_type == 1 else u"查看项目")
-        self.bt_achievement = QPushButton(u"成就管理" if user_type == 1 else u"个人成就")
-        self.bt_competition = QPushButton(u"比赛管理" if user_type == 1 else u"参与比赛")
-        self.bt_task = QPushButton(u"任务分配" if user_type == 1 else u"查看任务")
-        self.bt_seat = QPushButton(u"工委管理" if user_type == 1 else u"查看工位")
+        self.bt_permit = QPushButton(u"假条审批" if self.user_type == 1 else u"假条管理")
+        self.bt_project = QPushButton(u"项目管理" if self.user_type == 1 else u"查看项目")
+        self.bt_achievement = QPushButton(u"成就管理" if self.user_type == 1 else u"个人成就")
+        self.bt_competition = QPushButton(u"比赛管理" if self.user_type == 1 else u"参与比赛")
+        self.bt_task = QPushButton(u"任务分配" if self.user_type == 1 else u"查看任务")
+        self.bt_seat = QPushButton(u"工委管理" if self.user_type == 1 else u"查看工位")
         self.bts_pub = [self.bt_note, self.bt_attendance, self.bt_group,
                         self.bt_project,self.bt_competition, self.bt_achievement,
                         self.bt_permit, self.bt_source, self.bt_task,
@@ -234,9 +236,9 @@ class ManageWindow(QDialog):
         self.bt_s_selfInfo = QPushButton(u"个人信息")
         self.bts_stu = [self.bt_s_selfInfo]
 
-        self.init_ui(user_type)
+        self.init_ui()
 
-    def init_ui(self, user_type):
+    def init_ui(self):
         """
         初始化界面
         :param user_type:用户类型 学生０　教师１
@@ -248,7 +250,7 @@ class ManageWindow(QDialog):
         self.right_page.setLayout(self.right_layout)
 
         # 组合按钮
-        bts = self.bts_teacher if user_type == 1 else self.bts_stu
+        bts = self.bts_teacher if self.user_type == 1 else self.bts_stu
         bts.extend(self.bts_pub)
 
         # 根据按钮个数设置左右布局
@@ -284,4 +286,31 @@ class ManageWindow(QDialog):
 
         self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口
         self.showFullScreen()
+
+    # 仅用于ManageWindow的控件组合或窗口，构建内部类
+    class NoteTable(QWidget):
+        """
+        公告管理(教师)/查看公告(学生)--公告表格
+        """
+
+        def __init__(self):
+            QWidget.__init__(self)
+            # 布局
+            self.lay = QGridLayout()
+            # 添加控件
+
+            # 最后self添加布局
+            self.setLayout(self.lay)
+
+    class NoteDetail(QDialog):
+        """
+        点击公告表后弹出公告详情窗口(所有用户)/添加新公告窗口(教师)
+        教师权限：增查改 | 学生权限：查
+        """
+
+        def __init__(self):
+            QDialog.__init__(self)
+
+    class 
+
 
