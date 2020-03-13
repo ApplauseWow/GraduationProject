@@ -4,7 +4,7 @@ import sys
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
 
-from ui_design.ui_finish import MainWindow, InfoWindow, WarningWindow
+from ui_design.ui_finish import MainWindow, InfoWindow, WarningWindow, ManagementWindow
 
 
 class SysHome(MainWindow):
@@ -63,6 +63,6 @@ class Register():
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = Warning()
+    win_ = ManagementWindow(201610414206, 1)
     win_.show()
     sys.exit(app.exec_())
