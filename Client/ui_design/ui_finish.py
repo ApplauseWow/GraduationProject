@@ -287,288 +287,323 @@ class ManagementWindow(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口
         self.showFullScreen()
 
-    # 仅用于ManagementWindow的控件组合或窗口，构建内部类**之后继承MangementWindow放置GUI再添加内部类
-    class NoteTable(QWidget):
-        """
-        公告管理(教师)/查看公告(学生)--公告表格
-        教师权限：查删｜学生权限：查
-        """
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+class NoteTable(QWidget):
+    """
+    公告管理(教师)/查看公告(学生)--公告表格
+    教师权限：查删｜学生权限：查
+    数据需求：未过期公告序列｜过期公告序列
+    描述：【教师】两个表格分别为过期公告和未过期公告表
+    　　　【学生】一个表格未过期公告表
+    """
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-    class NoteDetail(QDialog):
-        """
-        点击公告表后弹出公告详情窗口(所有用户)/添加新公告窗口(教师)
-        教师权限：增查改 | 学生权限：查
-        """
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-        def __init__(self):
-            QDialog.__init__(self)
 
-    class StuffTable(QWidget):
-        """
-        人事管理(教师)--人事信息表格
-        教师权限：查删
-        """
+class NoteDetail(QDialog):
+    """
+    点击公告表后弹出公告详情窗口(所有用户)/添加新公告窗口(教师)
+    教师权限：增查改 | 学生权限：查
+    """
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+    def __init__(self):
+        QDialog.__init__(self)
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
 
-    class StuffDetail(QDialog):
-        """
-        点击人事表格后弹窗显示个人信息和个人总体考勤统计(教师)|添加人事信息窗口(教师)
-        教师权限：增查改
-        """
+class StuffTable(QWidget):
+    """
+    人事管理(教师)--人事信息表格
+    教师权限：查删
+    """
 
-        def __init__(self):
-            QDialog.__init__(self)
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-    class MyInfo(QWidget):
-        """
-        个人信息(学生)--个人信息展示
-        学生权限：查改
-        """
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+class StuffDetail(QDialog):
+    """
+    点击人事表格后弹窗显示个人信息和个人总体考勤统计(教师)|添加人事信息窗口(教师)
+    教师权限：增查改
+    """
 
-    class GroupTable(QWidget):
-        """
-        分组管理(教师)--组别信息表格
-        教师权限：查删
-        """
+    def __init__(self):
+        QDialog.__init__(self)
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+class MyInfo(QWidget):
+    """
+    个人信息(学生)--个人信息展示
+    学生权限：查改
+    """
 
-    class GroupDetail(QDialog):
-        """
-        点击分组表格后弹窗显示分组信息(教师)|添加分组信息窗口(教师)
-        教师权限：增查改
-        """
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-        def __init__(self):
-            QDialog.__init__(self)
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-    class MyGroup(QWidget):
-        """
-        查看分组(学生)--分组信息展示及其成员列表
-        学生权限：查
-        """
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+class GroupTable(QWidget):
+    """
+    分组管理(教师)--组别信息表格
+    教师权限：查删
+    """
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-    class AttendanceChart(QWidget):
-        """
-        考勤统计(所有用户)--考勤数据可视化图标，角色不同展示图表有差别
-        教师权限：查｜学生权限：查
-        """
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+class GroupDetail(QDialog):
+    """
+    点击分组表格后弹窗显示分组信息(教师)|添加分组信息窗口(教师)
+    教师权限：增查改
+    """
 
-    class SourceTable(QWidget):
-        """
-        资源管理(教师)/查看资源(学生)--资源表格
-        教师权限：查删｜学生权限：查
-        """
+    def __init__(self):
+        QDialog.__init__(self)
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+class MyGroup(QWidget):
+    """
+    查看分组(学生)--分组信息展示及其成员列表
+    学生权限：查
+    """
 
-    class SourceDetail(QDialog):
-        """
-        点击资源表后弹出公资源情窗口(所有用户)/添加新资源窗口(教师)
-        教师权限：增查改 | 学生权限：查
-        """
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-        def __init__(self):
-            QDialog.__init__(self)
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-    class PermitTable(QWidget):
-        """
-        假条审批(教师)/假条管理(学生)--假条表格
-        教师权限：查改(修改状态批准/拒绝)｜学生权限：查删
-        """
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+class AttendanceChart(QWidget):
+    """
+    考勤统计(所有用户)--考勤数据可视化图标，角色不同展示图表有差别
+    教师权限：查｜学生权限：查
+    """
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-    class PermitDetail(QDialog):
-        """
-        点击假条表后弹出假条详情窗口(所有用户)/添加新假条窗口(学生)
-        教师权限：查改(修改状态) | 学生权限：增查改(修改内容)
-        """
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-        def __init__(self):
-            QDialog.__init__(self)
 
-    class AchievementTable(QWidget):
-        """
-        成就管理(教师)/个人成就(学生)--成就表格
-        教师权限：查删｜学生权限：查
-        """
+class SourceTable(QWidget):
+    """
+    资源管理(教师)/查看资源(学生)--资源表格
+    教师权限：查删｜学生权限：查
+    """
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-    class AchievementDetail(QDialog):
-        """
-        点击成就表后弹出成就详情窗口(所有用户)/添加新成就窗口(教师)
-        教师权限：增查改 | 学生权限：查
-        """
 
-        def __init__(self):
-            QDialog.__init__(self)
+class SourceDetail(QDialog):
+    """
+    点击资源表后弹出公资源情窗口(所有用户)/添加新资源窗口(教师)
+    教师权限：增查改 | 学生权限：查
+    """
 
-    class CompetitionTable(QWidget):
-        """
-        比赛管理(教师)/参与比赛(学生)--比赛表格
-        教师权限：查删｜学生权限：查
-        """
+    def __init__(self):
+        QDialog.__init__(self)
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+class PermitTable(QWidget):
+    """
+    假条审批(教师)/假条管理(学生)--假条表格
+    教师权限：查改(修改状态批准/拒绝)｜学生权限：查删
+    """
 
-    class CompetitionDetail(QDialog):
-        """
-        点击比赛表后弹出比赛详情窗口(所有用户)/添加新比赛窗口(教师)
-        教师权限：增查改 | 学生权限：查
-        """
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-        def __init__(self):
-            QDialog.__init__(self)
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-    class ProjectTable(QWidget):
-        """
-        项目管理(教师)/查看项目(学生)--项目表格
-        教师权限：查删｜学生权限：查
-        """
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+class PermitDetail(QDialog):
+    """
+    点击假条表后弹出假条详情窗口(所有用户)/添加新假条窗口(学生)
+    教师权限：查改(修改状态) | 学生权限：增查改(修改内容)
+    """
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+    def __init__(self):
+        QDialog.__init__(self)
 
-    class ProjectDetail(QDialog):
-        """
-        点击项目表后弹出项目详情窗口(所有用户)/添加新项目窗口(教师)
-        教师权限：增查改 | 学生权限：查
-        """
 
-        def __init__(self):
-            QDialog.__init__(self)
+class AchievementTable(QWidget):
+    """
+    成就管理(教师)/个人成就(学生)--成就表格
+    教师权限：查删｜学生权限：查
+    """
 
-    class TaskArrangement(QWidget):
-        """
-        任务分配(教师)｜查看任务(学生)--任务表格
-        教师权限：查改(是否完成)｜学生权限：查
-        """
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
 
-    class TaskDetail(QDialog):
-        """
-        点击任务表后弹出项目详情窗口(所有用户)/添加新任务窗口(教师)
-        教师权限：增查改 | 学生权限：查
-        """
+class AchievementDetail(QDialog):
+    """
+    点击成就表后弹出成就详情窗口(所有用户)/添加新成就窗口(教师)
+    教师权限：增查改 | 学生权限：查
+    """
 
-        def __init__(self):
-            QDialog.__init__(self)
+    def __init__(self):
+        QDialog.__init__(self)
 
-    class SeatLocation(QWidget):
-        """
-        工位管理(教师)/查看工位(学生)--工位分部示意图
-        教师权限：增查删｜学生权限：查
-        """
 
-        def __init__(self):
-            QWidget.__init__(self)
-            # 布局
-            self.lay = QGridLayout()
-            # 添加控件
+class CompetitionTable(QWidget):
+    """
+    比赛管理(教师)/参与比赛(学生)--比赛表格
+    教师权限：查删｜学生权限：查
+    """
 
-            # 最后self添加布局
-            self.setLayout(self.lay)
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
 
-    class SeatDetail(QDialog):
-        """
-        点击工位后弹出工位详情窗口(所有用户)
-        教师权限：查改 | 学生权限：查
-        """
+        # 最后self添加布局
+        self.setLayout(self.lay)
 
-        def __init__(self):
-            QDialog.__init__(self)
+
+class CompetitionDetail(QDialog):
+    """
+    点击比赛表后弹出比赛详情窗口(所有用户)/添加新比赛窗口(教师)
+    教师权限：增查改 | 学生权限：查
+    """
+
+    def __init__(self):
+        QDialog.__init__(self)
+
+
+class ProjectTable(QWidget):
+    """
+    项目管理(教师)/查看项目(学生)--项目表格
+    教师权限：查删｜学生权限：查
+    """
+
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
+
+        # 最后self添加布局
+        self.setLayout(self.lay)
+
+
+class ProjectDetail(QDialog):
+    """
+    点击项目表后弹出项目详情窗口(所有用户)/添加新项目窗口(教师)
+    教师权限：增查改 | 学生权限：查
+    """
+
+    def __init__(self):
+        QDialog.__init__(self)
+
+
+class TaskArrangement(QWidget):
+    """
+    任务分配(教师)｜查看任务(学生)--任务表格
+    教师权限：查改(是否完成)｜学生权限：查
+    """
+
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
+
+        # 最后self添加布局
+        self.setLayout(self.lay)
+
+
+class TaskDetail(QDialog):
+    """
+    点击任务表后弹出项目详情窗口(所有用户)/添加新任务窗口(教师)
+    教师权限：增查改 | 学生权限：查
+    """
+
+    def __init__(self):
+        QDialog.__init__(self)
+
+
+class SeatLocation(QWidget):
+    """
+    工位管理(教师)/查看工位(学生)--工位分部示意图
+    教师权限：增查删｜学生权限：查
+    """
+
+    def __init__(self):
+        QWidget.__init__(self)
+        # 布局
+        self.lay = QGridLayout()
+        # 添加控件
+
+        # 最后self添加布局
+        self.setLayout(self.lay)
+
+
+class SeatDetail(QDialog):
+    """
+    点击工位后弹出工位详情窗口(所有用户)
+    教师权限：查改 | 学生权限：查
+    """
+
+    def __init__(self):
+        QDialog.__init__(self)
+
+
+class Pagination(QWidget):
+    """
+    基础数据表分页控件组合
+    需要根据具体需求继承后重写
+    在此仅定义必要静态样式和方法
+    """
+
+    def __init__(self, ):

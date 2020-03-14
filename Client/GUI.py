@@ -4,7 +4,7 @@ import sys
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
 
-from ui_design.ui_finish import MainWindow, InfoWindow, WarningWindow, ManagementWindow
+from ui_design.ui_finish import *
 
 
 class SysHome(MainWindow):
@@ -59,6 +59,27 @@ class Register():
 
     def __init__(self):
         super(Register, self).__init__()
+
+
+class MyInfo(InfoWindow):
+    """
+    考勤窗口｜个人信息显示窗口
+    """
+
+    def __init__(self):
+        super(MyInfo, self).__init__()
+
+
+class Management(ManagementWindow):
+    """
+    资源管理窗口
+    """
+
+    def __init__(self):
+        super(Management, self).__init__()
+
+    class
+
 
 
 if __name__ == "__main__":
