@@ -78,7 +78,7 @@ class Management(ManagementWindow):
     def __init__(self):
         super(Management, self).__init__()
 
-    class
+
 
 
 

@@ -1,8 +1,10 @@
 # -*-coding:utf-8-*-
 from PyQt5.QtGui import QFont, QPixmap
-from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QDialog, QLabel, QLCDNumber, QGridLayout, QPushButton
+from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QDialog, QLabel, QLCDNumber, QGridLayout, QPushButton, \
+    QLineEdit, QVBoxLayout, QHBoxLayout, QHeaderView, QMessageBox, QTableWidget
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QEvent
 import time
+import re
 
 from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
@@ -606,4 +608,139 @@ class Pagination(QWidget):
     在此仅定义必要静态样式和方法
     """
 
-    def __init__(self, ):
+    def __init__(self):
+        super(Pagination, self).__init__()
+        # 布局管理器
+        self.layout = QVBoxLayout()
+        # 表格视图
+        self.table = QTableWidget()
+
+        self.totalPageLabel = QLabel()
+        self.currentPageLabel = QLabel()
+        self.switchPageLineEdit = QLineEdit()
+        self.prevButton = QPushButton("Prev")
+        self.nextButton = QPushButton("Next")
+        self.switchPageButton = QPushButton("Switch")
+        # 当前页
+        self.currentPage = 1
+        # 总页数
+        self.totalPage = 0
+        # 总记录数
+        self.totalRecordCount = 0
+        # 每页记录数
+        self.pageRecordCount = 4
+
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.layout.addWidget(self.table)
+
+        hLayout = QHBoxLayout()
+        hLayout.addWidget(self.prevButton)
+        hLayout.addWidget(self.nextButton)
+        hLayout.addWidget(QLabel("跳转到"))
+        self.switchPageLineEdit.setFixedWidth(40)
+        hLayout.addWidget(self.switchPageLineEdit)
+        hLayout.addWidget(QLabel("页"))
+        hLayout.addWidget(self.switchPageButton)
+        hLayout.addWidget(QLabel("当前页："))
+        hLayout.addWidget(self.currentPageLabel)
+        hLayout.addWidget(QLabel("总页数："))
+        hLayout.addWidget(self.totalPageLabel)
+        hLayout.addStretch(1)
+
+        self.layout.addLayout(hLayout)
+        self.setLayout(self.layout)
+        self.resize(200, 300)
+
+        self.initializedModel()
+        self.setUpConnect()
+        self.updateStatus()
+
+    def setUpConnect(self):
+        """
+        添加按钮槽函数
+        :return:
+        """
+        self.prevButton.clicked.connect(self.onPrevPage)
+        self.nextButton.clicked.connect(self.onNextPage)
+        self.switchPageButton.clicked.connect(self.onSwitchPage)
+
+    def initializedModel(self):
+        """
+        初始化界面数据，待重写
+        :return:
+        """
+        pass
+
+    def onPrevPage(self):
+        """
+        上一页
+        :return:
+        """
+
+        self.currentPage -= 1
+        limitIndex = (self.currentPage - 1) * self.pageRecordCount
+        self.queryRecord(limitIndex)
+        self.updateStatus()
+
+    def onNextPage(self):
+        """
+        下一页
+        :return:
+        """
+
+        self.currentPage += 1
+        limitIndex = (self.currentPage - 1) * self.pageRecordCount
+        self.queryRecord(limitIndex)
+        self.updateStatus()
+
+    def onSwitchPage(self):
+        """
+        切换到指定页面
+        :return:
+        """
+
+        szText = self.switchPageLineEdit.text()
+        pattern = re.compile('^[0-9]+$')
+        match = pattern.match(szText)
+        if not match:
+            QMessageBox.information(self, "提示", "请输入数字.")
+            return
+        if szText == "":
+            QMessageBox.information(self, "提示", "请输入跳转页面.")
+            return
+        pageIndex = int(szText)
+        if pageIndex > self.totalPage or pageIndex < 1:
+            QMessageBox.information(self, "提示", "没有指定的页，清重新输入.")
+            return
+
+        limitIndex = (pageIndex - 1) * self.pageRecordCount
+        self.queryRecord(limitIndex)
+        self.currentPage = pageIndex
+        self.updateStatus()
+
+    def queryRecord(self, limitIndex):
+        """
+        根据分页查询记录，待重写
+        :param limitIndex:开头记录位置
+        :return:
+        """
+        pass
+
+    def updateStatus(self):
+        """
+        更新控件状态
+        :return:
+        """
+
+        self.currentPageLabel.setText(str(self.currentPage))
+        self.totalPageLabel.setText(str(self.totalPage))
+        if self.currentPage <= 1:
+            self.prevButton.setEnabled(False)
+        else:
+            self.prevButton.setEnabled(True)
+
+        if self.currentPage >= self.totalPage:
+            self.nextButton.setEnabled(False)
+        else:
+            self.nextButton.setEnabled(True)
