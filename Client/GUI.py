@@ -52,7 +52,7 @@ class Warning(WarningWindow):
         self.close()
 
 
-class Register():
+class Register(RegisterWindow):
     """
     人脸注册窗口
     """
@@ -82,25 +82,137 @@ class Management(ManagementWindow):
     def showPage(self):
         y = QGridLayout()
         w = QWidget()
-        y.addWidget(self.page(), 5, 3, 5, 8)
-        y.addWidget(self.page(), 5, 11, 5, 8)
+        y.addWidget(Page(), 5, 3, 5, 8)
+        y.addWidget(Page(), 5, 11, 5, 8)
         y.setRowStretch(1,1)
         y.setRowStretch(5, 8)
         y.setRowStretch(12, 1)
         w.setLayout(y)
         self.right_layout.addWidget(w)
 
-    class page(Pagination):
 
-        def __init__(self):
-            Pagination.__init__(self)
+class Page(Pagination):
+    """
+    数据表分页，构建基本事件响应函数
+    Management中多个控件需要重写此类
+    """
 
+    def __init__(self):
+        super(Page, self).__init__()
 
+    def setUpConnect(self):
+        """
+        添加按钮槽函数
+        :return:
+        """
+        self.prevButton.clicked.connect(self.onPrevPage)
+        self.nextButton.clicked.connect(self.onNextPage)
+        self.switchPageButton.clicked.connect(self.onSwitchPage)
 
+    def initializedModel(self):
+        """
+        初始化界面数据，待重写
+        :return:
+        """
 
+        # 测试表格
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置表格不可修改
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 选中时选一行
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.horizontalHeader().setFixedHeight(30)
+        self.table.verticalHeader().setVisible(False)
+        self.table.setColumnCount(5)
+        self.table.setRowCount(self.pageRecordCount + 20)
+        # self.table.setHorizontalHeaderLabels(['id', u'标题', u'内容', u'操作'])
+        # self.table.setColumnHidden(0, True)  # 隐藏某列
+        for j in range(100):
+            for i in range(5):
+                item = QTableWidgetItem(str(i))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.table.setItem(j, i, item)
+
+    def queryRecord(self, limitIndex):
+        """
+        根据分页查询记录，待重写
+        :param limitIndex:开头记录位置
+        :return:
+        """
+        pass
+
+    def onPrevPage(self):
+        """
+        上一页
+        :return:
+        """
+
+        self.currentPage -= 1
+        limitIndex = (self.currentPage - 1) * self.pageRecordCount
+        self.queryRecord(limitIndex)
+        self.updateStatus()
+
+    def onNextPage(self):
+        """
+        下一页
+        :return:
+        """
+
+        self.currentPage += 1
+        limitIndex = (self.currentPage - 1) * self.pageRecordCount
+        self.queryRecord(limitIndex)
+        self.updateStatus()
+
+    def onSwitchPage(self):
+        """
+        切换到指定页面
+        :return:
+        """
+
+        szText = self.switchPageLineEdit.text()
+        pattern = re.compile('^[0-9]+$')
+        match = pattern.match(szText)
+        if not match:
+            QMessageBox.information(self, "提示", "请输入数字.")
+            return
+        if szText == "":
+            QMessageBox.information(self, "提示", "请输入跳转页面.")
+            return
+        pageIndex = int(szText)
+        if pageIndex > self.totalPage or pageIndex < 1:
+            QMessageBox.information(self, "提示", "没有指定的页，清重新输入.")
+            return
+
+        limitIndex = (pageIndex - 1) * self.pageRecordCount
+        self.queryRecord(limitIndex)
+        self.currentPage = pageIndex
+        self.updateStatus()
+
+    def updateStatus(self):
+        """
+        更新控件状态
+        :return:
+        """
+
+        self.currentPageLabel.setText(str(self.currentPage))
+        self.totalPageLabel.setText(str(self.totalPage))
+        if self.currentPage <= 1:
+            self.prevButton.setEnabled(False)
+        else:
+            self.prevButton.setEnabled(True)
+
+        if self.currentPage >= self.totalPage:
+            self.nextButton.setEnabled(False)
+        else:
+            self.nextButton.setEnabled(True)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win_ = Management(201610414206, 1)
     win_.show()
+    # win1 = SysHome()
+    # win2 = MyInfo()
+    # win2.show()
+    # win3 = Register()
+    # win3.show()
+    # win4 = Warning()
+    # win4.show()
     sys.exit(app.exec_())
