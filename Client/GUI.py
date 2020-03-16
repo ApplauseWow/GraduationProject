@@ -75,8 +75,25 @@ class Management(ManagementWindow):
     资源管理窗口
     """
 
-    def __init__(self):
-        super(Management, self).__init__()
+    def __init__(self, user_id, user_type):
+        super(Management, self).__init__(user_id, user_type)
+        self.bt_close.clicked.connect(self.showPage)
+
+    def showPage(self):
+        y = QGridLayout()
+        w = QWidget()
+        y.addWidget(self.page(), 5, 3, 5, 8)
+        y.addWidget(self.page(), 5, 11, 5, 8)
+        y.setRowStretch(1,1)
+        y.setRowStretch(5, 8)
+        y.setRowStretch(12, 1)
+        w.setLayout(y)
+        self.right_layout.addWidget(w)
+
+    class page(Pagination):
+
+        def __init__(self):
+            Pagination.__init__(self)
 
 
 
@@ -84,6 +101,6 @@ class Management(ManagementWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = ManagementWindow(201610414206, 1)
+    win_ = Management(201610414206, 1)
     win_.show()
     sys.exit(app.exec_())

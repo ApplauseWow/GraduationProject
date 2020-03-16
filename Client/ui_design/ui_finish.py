@@ -1,7 +1,8 @@
 # -*-coding:utf-8-*-
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QDialog, QLabel, QLCDNumber, QGridLayout, QPushButton, \
-    QLineEdit, QVBoxLayout, QHBoxLayout, QHeaderView, QMessageBox, QTableWidget
+    QLineEdit, QVBoxLayout, QHBoxLayout, QHeaderView, QMessageBox, QTableWidget, QAbstractItemView, QTableWidgetItem, \
+    QFrame
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QEvent
 import time
 import re
@@ -205,14 +206,10 @@ class ManagementWindow(QDialog):
         self.left_layout = QGridLayout()
         self.right_page = QWidget()
         self.right_layout = QGridLayout()
-        self.setStyleSheet("background-color: #FF8C00;")
-        self.right_page.setStyleSheet('''color:#232C51;
-        background:white;
-        border-top:1px solid darkGray;
-        border-bottom:5px solid darkGray;
-        border-right:5px solid darkGray;
-        border-top-right-radius:10px;
-        border-bottom-right-radius:10px;''')
+        self.setObjectName("management")
+        self.setStyleSheet("#management{background-color: white;}")
+        self.right_page.setObjectName("right_page")
+        self.right_page.setStyleSheet('''#right_page{border-left:3px solid orange}''')
 
         # 左侧菜单按钮
         # --公共组
@@ -267,21 +264,27 @@ class ManagementWindow(QDialog):
 "                   border-style:outset;                  "
 "                   border-width:4px;                     "
 "                   border-radius:20px;                "
-"                   border-color:rgba(255,255,255,255);   "
+"                   border-color:rgba(255,165,0,255);   "
 "                   font:bold 23px;                    "
 "                   color:rgba(255,165,0,255);                "
 "                   padding:6px;                      "
+                             "text-align:left"
 "                   }"
 "                   QPushButton:pressed{"
-"                   background-color:rgba(255,165,0,255);"
-"                   border-color:rgba(255,255,255,30);"
-"                   border-style:inset;"
-"                   color:rgba(255,255,255,255);"
+"                   background-color:rgba(255,255,255,255);"
+"                   border-color:rgba(255,165,0,255);"
+"                   color:rgba(255,165,0,255);"
+                             "border-right:8px solid orange;"
+                             "border-left:8px solid orange;"
+                             "text-align:center;"
 "                   }"
 "                   QPushButton:hover{"
-"                   background-color:rgba(255,165,0,255);"
-"                   border-color:rgba(255,255,255,255);"
-"                   color:rgba(255,255,255,255);"
+"                   background-color:rgba(255,255,255,255);"
+"                   border-color:rgba(255,165,0,255);"
+"                   color:rgba(255,165,0,255);"
+                             "border-right:8px solid orange;"
+                             "border-left:8px solid orange;"
+                             "text-align:center;"
 "                   }")
 
         self.setLayout(self.whole_layout)
@@ -614,17 +617,23 @@ class Pagination(QWidget):
         self.layout = QVBoxLayout()
         # 表格视图
         self.table = QTableWidget()
+        self.table.setShowGrid(False)  # 不显示网格
 
         self.totalPageLabel = QLabel()
         self.currentPageLabel = QLabel()
         self.switchPageLineEdit = QLineEdit()
+        self.switchPageLineEdit.setObjectName("ed_page")
         self.prevButton = QPushButton("Prev")
+        self.prevButton.setObjectName("bt_page")
         self.nextButton = QPushButton("Next")
+        self.nextButton.setObjectName("bt_page")
         self.switchPageButton = QPushButton("Switch")
+        self.switchPageButton.setObjectName("bt_page")
+
         # 当前页
         self.currentPage = 1
         # 总页数
-        self.totalPage = 0
+        self.totalPage = 1
         # 总记录数
         self.totalRecordCount = 0
         # 每页记录数
@@ -648,6 +657,12 @@ class Pagination(QWidget):
         hLayout.addWidget(self.totalPageLabel)
         hLayout.addStretch(1)
 
+        line = QFrame()
+        line.setFrameShape(QFrame.HLine)
+        line.setFrameShadow(QFrame.Plain)
+        line.setObjectName("line")
+
+        self.layout.addWidget(line)
         self.layout.addLayout(hLayout)
         self.setLayout(self.layout)
         self.resize(200, 300)
@@ -655,6 +670,40 @@ class Pagination(QWidget):
         self.initializedModel()
         self.setUpConnect()
         self.updateStatus()
+
+    def setUpCSS(self):
+        """
+        美化控件,必要时先设置ObjectName
+        :return:None
+        """
+
+        self.setStyleSheet('''
+            QPushButton#bt_page{
+                background-color:white;
+                border: 3px solid orange;
+                border-radius:5px;
+                color:orange;
+            }
+            QLineEdit#ed_page{
+                border:3px solid orange;
+                color:orange;
+            }
+            #line{
+                background-color:orange;
+                border:none;
+            }
+            QTableWidget{
+                border:none;
+            }
+            QHeaderView::section{
+                background-color:orange;
+                color:white;
+                border:none;
+            }
+            QTableWidget::item{
+                border-bottom:2px solid orange
+            }
+            ''')
 
     def setUpConnect(self):
         """
@@ -670,8 +719,22 @@ class Pagination(QWidget):
         初始化界面数据，待重写
         :return:
         """
-        pass
 
+        # 测试表格
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置表格不可修改
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 选中时选一行
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.horizontalHeader().setFixedHeight(30)
+        self.table.verticalHeader().setVisible(False)
+        self.table.setColumnCount(5)
+        self.table.setRowCount(self.pageRecordCount+20)
+        # self.table.setHorizontalHeaderLabels(['id', u'标题', u'内容', u'操作'])
+        # self.table.setColumnHidden(0, True)  # 隐藏某列
+        for j in range(100):
+            for i in range(5):
+                item = QTableWidgetItem(str(i))
+                item.setTextAlignment(Qt.AlignHCenter|Qt.AlignVCenter)
+                self.table.setItem(j, i, item)
     def onPrevPage(self):
         """
         上一页

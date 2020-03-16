@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QPushButton, QWidget, QGridLayout
 from PyQt5 import QtCore
 from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
@@ -44,9 +44,16 @@ if __name__ == "__main__":
     # exec("bt_{} = QPushButton()".format("close"))
     # print bt_close
     win3 = ManagementWindow(201610414206, 1)
-    # win3.right_layout.addWidget(Pagination(),0,0,5,5)
-    # win3.right_layout.addWidget(Pagination(),0,6,5,5)
-    win3.show()
+    w = QWidget()
+    y = QGridLayout()
+    page = Pagination()
+    p2 = Pagination()
+    y.addWidget(page, 0, 0, 5, 9)
+    y.addWidget(p2, 0, 5, 5, 9)
+    w.setLayout(y)
+    win3.right_layout.addWidget(w)
+    # win4 = Pagination()
+    # win4.show()
     sys.exit(app.exec_())
 
 "style sheet"
