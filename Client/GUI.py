@@ -77,18 +77,21 @@ class Management(ManagementWindow):
 
     def __init__(self, user_id, user_type):
         super(Management, self).__init__(user_id, user_type)
-        self.bt_close.clicked.connect(self.showPage)
+        self.bt_note.clicked.connect(self.showPage)
 
     def showPage(self):
-        y = QGridLayout()
-        w = QWidget()
-        y.addWidget(Page(), 5, 3, 5, 8)
-        y.addWidget(Page(), 5, 11, 5, 8)
-        y.setRowStretch(1,1)
-        y.setRowStretch(5, 8)
-        y.setRowStretch(12, 1)
-        w.setLayout(y)
-        self.right_layout.addWidget(w)
+        self.right_layout.addWidget(self.ShowNotes())
+
+    class ShowNotes(NoteTable):
+        """
+        继承NoteTable封装业务逻辑
+        """
+
+        def __init__(self):
+            NoteTable.__init__(self)
+            self.lay.addWidget(Page(),1,0,5,5)
+            self.lay.addWidget(Page(),1,5,5,5)
+
 
 
 class Page(Pagination):

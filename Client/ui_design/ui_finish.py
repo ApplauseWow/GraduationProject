@@ -2,7 +2,7 @@
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QDialog, QLabel, QLCDNumber, QGridLayout, QPushButton, \
     QLineEdit, QVBoxLayout, QHBoxLayout, QHeaderView, QMessageBox, QTableWidget, QAbstractItemView, QTableWidgetItem, \
-    QFrame
+    QFrame, QStackedLayout
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QEvent
 import time
 import re
@@ -200,12 +200,13 @@ class ManagementWindow(QDialog):
         super(ManagementWindow, self).__init__()
         self.user_id = user_id
         self.user_type = user_type
+        self.menu_dict = dict()  # 菜单按钮对应的索引号
         # 界面总体布局控件
         self.whole_layout = QGridLayout()
         self.left_menu = QWidget()
         self.left_layout = QGridLayout()
         self.right_page = QWidget()
-        self.right_layout = QGridLayout()
+        self.right_layout = QStackedLayout()  # 右侧主界面采用堆叠布局切换页面
         self.setObjectName("management")
         self.setStyleSheet("#management{background-color: white;}")
         self.right_page.setObjectName("right_page")
@@ -258,6 +259,7 @@ class ManagementWindow(QDialog):
 
         # 布置按钮
         for row, bt in enumerate(bts):  # 排列按钮
+            self.menu_dict[] = row
             self.left_layout.addWidget(bt, row, 0, 1, 3)  # 从row行0列开始占1行3列
             bt.setStyleSheet("QPushButton{"
 "                   background-color:rgba(255,255,255,255);"
@@ -303,14 +305,34 @@ class NoteTable(QWidget):
     """
 
     def __init__(self):
-        QWidget.__init__(self)  
+        QWidget.__init__(self)
         # 布局
         self.lay = QGridLayout()
         # 添加控件
-
+        self.l_current_note = QLabel()
+        self.l_previous_note = QLabel()
+        self.lay.addWidget(self.l_current_note, 0, 0, 1, 5)
+        self.lay.addWidget(self.l_previous_note, 0, 5, 1, 5)
         # 最后self添加布局
         self.setLayout(self.lay)
+        self.setUpCSS()
 
+    def setUpCSS(self):
+        """
+        添加样式
+        :return: None
+        """
+
+        self.l_current_note.setText(u"最新公告")
+        self.l_previous_note.setText(u"过期公告")
+        map(lambda x: x.setObjectName("note_label"), [self.l_previous_note, self.l_current_note])
+        self.setStyleSheet('''
+            QLabel#note_label{
+                font: 24px;
+                color:black;
+                border: 3px solid orange
+            }
+        ''')
 
 class NoteDetail(QDialog):
     """
