@@ -77,21 +77,43 @@ class Management(ManagementWindow):
 
     def __init__(self, user_id, user_type):
         super(Management, self).__init__(user_id, user_type)
-        self.bt_note.clicked.connect(self.showPage)
+        # 添加顺序一定按照按钮顺序
+        self.right_layout.addWidget(self.ShowNotes())  # ！？可能存在切换后切回不是初始状态
+        self.setUpConnect()
 
-    def showPage(self):
-        self.right_layout.addWidget(self.ShowNotes())
+    def setUpConnect(self):
+        """
+        绑定按钮槽函数
+        :return: None
+        """
+
+        map(lambda x: x.clicked.connect(self.switchPage), self.bts)
+
+    def switchPage(self):
+        """
+        点击菜单按钮后切换页面
+        :return: None
+        """
+
+        # 可能与其他sender冲突
+        try:
+            index = self.menu_dict[self.sender().objectName()]
+            self.right_layout.setCurrentIndex(index)
+        except:
+            pass
 
     class ShowNotes(NoteTable):
         """
         继承NoteTable封装业务逻辑
+        数据需求：未过期公告序列｜过期公告序列
+        描述：【教师】两个表格分别为过期公告和未过期公告表
+    　　　    【学生】一个表格未过期公告表
         """
 
         def __init__(self):
             NoteTable.__init__(self)
             self.lay.addWidget(Page(),1,0,5,5)
             self.lay.addWidget(Page(),1,5,5,5)
-
 
 
 class Page(Pagination):

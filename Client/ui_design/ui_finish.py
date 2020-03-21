@@ -215,25 +215,38 @@ class ManagementWindow(QDialog):
         # 左侧菜单按钮
         # --公共组
         self.bt_close = QPushButton(u"退出")
+        self.bt_close.setObjectName("exit")
         self.bt_note = QPushButton(u"公告管理" if self.user_type == 1 else u"查看公告")
+        self.bt_note.setObjectName("note")
         self.bt_group = QPushButton(u"分组管理" if self.user_type == 1 else u"查看分组")
+        self.bt_group.setObjectName("group")
         self.bt_source = QPushButton(u"资源管理" if self.user_type == 1 else u"查看资源")
+        self.bt_source.setObjectName("source")
         self.bt_attendance = QPushButton(u"考勤统计")
+        self.bt_attendance.setObjectName("attendance")
         self.bt_permit = QPushButton(u"假条审批" if self.user_type == 1 else u"假条管理")
+        self.bt_permit.setObjectName("permit")
         self.bt_project = QPushButton(u"项目管理" if self.user_type == 1 else u"查看项目")
+        self.bt_project.setObjectName("project")
         self.bt_achievement = QPushButton(u"成就管理" if self.user_type == 1 else u"个人成就")
+        self.bt_achievement.setObjectName("achievement")
         self.bt_competition = QPushButton(u"比赛管理" if self.user_type == 1 else u"参与比赛")
+        self.bt_competition.setObjectName("competition")
         self.bt_task = QPushButton(u"任务分配" if self.user_type == 1 else u"查看任务")
+        self.bt_task.setObjectName("task")
         self.bt_seat = QPushButton(u"工位管理" if self.user_type == 1 else u"查看工位")
+        self.bt_seat.setObjectName("seat")
         self.bts_pub = [self.bt_note, self.bt_attendance, self.bt_group,
                         self.bt_project,self.bt_competition, self.bt_achievement,
                         self.bt_permit, self.bt_source, self.bt_task,
                         self.bt_seat, self.bt_close]
         # --教师组
         self.bt_t_stuff = QPushButton(u"人事管理")
+        self.bt_t_stuff.setObjectName("stuff")
         self.bts_teacher = [self.bt_t_stuff]
         # --学生组
         self.bt_s_selfInfo = QPushButton(u"个人信息")
+        self.bt_s_selfInfo.setObjectName("self_info")
         self.bts_stu = [self.bt_s_selfInfo]
 
         self.init_ui()
@@ -250,16 +263,16 @@ class ManagementWindow(QDialog):
         self.right_page.setLayout(self.right_layout)
 
         # 组合按钮
-        bts = self.bts_teacher if self.user_type == 1 else self.bts_stu
-        bts.extend(self.bts_pub)
+        self.bts = self.bts_teacher if self.user_type == 1 else self.bts_stu
+        self.bts.extend(self.bts_pub)
 
         # 根据按钮个数设置左右布局
-        self.whole_layout.addWidget(self.left_menu, 0, 0, len(bts), 2)  # 左部菜单在０行０列开始占１２行３列
-        self.whole_layout.addWidget(self.right_page, 0, 2, len(bts), len(bts)-2)  # 右部页面在０行３列开始占１２行１０列
+        self.whole_layout.addWidget(self.left_menu, 0, 0, len(self.bts), 2)  # 左部菜单在０行０列开始占１２行３列
+        self.whole_layout.addWidget(self.right_page, 0, 2, len(self.bts), len(self.bts)-2)  # 右部页面在０行３列开始占１２行１０列
 
         # 布置按钮
-        for row, bt in enumerate(bts):  # 排列按钮
-            self.menu_dict[] = row
+        for row, bt in enumerate(self.bts):  # 排列按钮
+            self.menu_dict[bt.objectName()] = row
             self.left_layout.addWidget(bt, row, 0, 1, 3)  # 从row行0列开始占1行3列
             bt.setStyleSheet("QPushButton{"
 "                   background-color:rgba(255,255,255,255);"
@@ -299,9 +312,6 @@ class NoteTable(QWidget):
     """
     公告管理(教师)/查看公告(学生)--公告表格
     教师权限：查删｜学生权限：查
-    数据需求：未过期公告序列｜过期公告序列
-    描述：【教师】两个表格分别为过期公告和未过期公告表
-    　　　【学生】一个表格未过期公告表
     """
 
     def __init__(self):
@@ -333,6 +343,7 @@ class NoteTable(QWidget):
                 border: 3px solid orange
             }
         ''')
+
 
 class NoteDetail(QDialog):
     """
