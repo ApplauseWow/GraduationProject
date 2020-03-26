@@ -32,13 +32,16 @@ class DBC(object):
         else:
             pass
 
-    def get_all_user_info(self):
+    def get_all_info(self, table, start_end = ()):
         """
-        获取所有用户信息
-        :return: (user_info),(...
+        获取表所有信息
+        :return: (info),(...
         """
 
-        sql = 'select * from user_info;'
+        if start_end is ():
+            sql = 'select * from {};'.format(table)
+        else:
+            sql = 'select * from {} limit {}, {}'.format(table, start_end[0], start_end[1])
         cursor = self.conn.cursor()
         try:
             cursor.execute(sql)
@@ -50,11 +53,21 @@ class DBC(object):
             cursor.close()
         return users
 
+    # user_info表
+    def insert_user(self, user_info_dict):
+        """
+        添加新用户
+        :param user_info_dict:
+        :return:
+        """
+
+
+
 
 if __name__ == '__main__':
     try:
         db = DBC()
-        print db.get_all_user_info()
+        print db.get_all_info('user_info', (2, 3))
     except Exception as e:
         print(e)
         db = None
