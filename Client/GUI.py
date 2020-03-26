@@ -7,115 +7,6 @@ from PyQt5.QtWidgets import QApplication
 from ui_design.ui_finish import *
 
 
-class SysHome(MainWindow):
-    """
-    主界面
-    """
-
-    def __init__(self):
-        super(SysHome, self).__init__()
-
-        # 设置定时器
-        self.timer_clock = QTimer()
-        self.timer_clock.setInterval(1000)
-        self.timer_clock.start()
-        self.timer_clock.timeout.connect(self.update_time)
-
-    def update_time(self):
-        """
-        更新时间
-        :return:None
-        """
-
-        self.clock.display(time.strftime("%X", time.localtime()))
-
-
-class Warning(WarningWindow):
-    """
-    警告提醒窗
-    """
-
-    def __init__(self):
-        super(Warning, self).__init__()
-        # 设置定时器
-        self.time_count = QTimer()
-        self.time_count.setInterval(1500)
-        self.time_count.start()
-        self.time_count.timeout.connect(self.timeout_close)
-
-    def timeout_close(self):
-        """
-        倒计时关闭此窗口
-        :return: None
-        """
-
-        self.close()
-
-
-class Register(RegisterWindow):
-    """
-    人脸注册窗口
-    """
-
-    def __init__(self):
-        super(Register, self).__init__()
-
-
-class MyInfo(InfoWindow):
-    """
-    考勤窗口｜个人信息显示窗口
-    """
-
-    def __init__(self):
-        super(MyInfo, self).__init__()
-
-
-class Management(ManagementWindow):
-    """
-    资源管理窗口
-    """
-
-    def __init__(self, user_id, user_type):
-        super(Management, self).__init__(user_id, user_type)
-        # 添加顺序一定按照按钮顺序
-        self.right_layout.addWidget(self.ShowNotes())  # ！？可能存在切换后切回不是初始状态
-        self.setUpConnect()
-
-    def setUpConnect(self):
-        """
-        绑定按钮槽函数
-        :return: None
-        """
-
-        map(lambda x: x.clicked.connect(self.switchPage), self.bts)
-
-    def switchPage(self):
-        """
-        点击菜单按钮后切换页面
-        :return: None
-        """
-
-        # 可能与其他sender冲突
-        try:
-            index = self.menu_dict[self.sender().objectName()]
-            self.right_layout.setCurrentIndex(index)
-        except:
-            pass
-
-    class ShowNotes(NoteTable):
-        """
-        继承NoteTable封装业务逻辑
-        数据需求：未过期公告序列｜过期公告序列
-        描述：【教师】两个表格分别为过期公告和未过期公告表
-    　　　    【学生】一个表格未过期公告表
-        """
-
-        def __init__(self):
-            NoteTable.__init__(self)
-            self.lay.addWidget(Page(),1,0,5,5)
-            self.lay.addWidget(Page(),1,5,5,5)
-
-
 class Page(Pagination):
     """
     数据表分页，构建基本事件响应函数
@@ -228,6 +119,134 @@ class Page(Pagination):
             self.nextButton.setEnabled(False)
         else:
             self.nextButton.setEnabled(True)
+
+
+class SysHome(MainWindow):
+    """
+    主界面
+    """
+
+    def __init__(self):
+        super(SysHome, self).__init__()
+
+        # 设置定时器
+        self.timer_clock = QTimer()
+        self.timer_clock.setInterval(1000)
+        self.timer_clock.start()
+        self.timer_clock.timeout.connect(self.update_time)
+
+    def update_time(self):
+        """
+        更新时间
+        :return:None
+        """
+
+        self.clock.display(time.strftime("%X", time.localtime()))
+
+
+class Warning(WarningWindow):
+    """
+    警告提醒窗
+    """
+
+    def __init__(self):
+        super(Warning, self).__init__()
+        # 设置定时器
+        self.time_count = QTimer()
+        self.time_count.setInterval(1500)
+        self.time_count.start()
+        self.time_count.timeout.connect(self.timeout_close)
+
+    def timeout_close(self):
+        """
+        倒计时关闭此窗口
+        :return: None
+        """
+
+        self.close()
+
+
+class Register(RegisterWindow):
+    """
+    人脸注册窗口
+    """
+
+    def __init__(self):
+        super(Register, self).__init__()
+
+
+class MyInfo(InfoWindow):
+    """
+    考勤窗口｜个人信息显示窗口
+    """
+
+    def __init__(self):
+        super(MyInfo, self).__init__()
+
+
+class Management(ManagementWindow):
+    """
+    资源管理窗口
+    """
+
+    def __init__(self, user_id, user_type):
+        super(Management, self).__init__(user_id, user_type)
+        # 添加顺序一定按照按钮顺序
+        self.right_layout.addWidget(self.ShowNotes())  # ！？可能存在切换后切回不是初始状态
+        self.setUpConnect()
+
+    def setUpConnect(self):
+        """
+        绑定按钮槽函数
+        :return: None
+        """
+
+        map(lambda x: x.clicked.connect(self.switchPage), self.bts)
+
+    def switchPage(self):
+        """
+        点击菜单按钮后切换页面
+        :return: None
+        """
+
+        # 可能与其他sender冲突
+        try:
+            index = self.menu_dict[self.sender().objectName()]
+            self.right_layout.setCurrentIndex(index)
+        except:
+            pass
+
+    class ShowNotes(NoteTable):
+        """
+        继承NoteTable封装业务逻辑
+        数据需求：未过期公告序列｜过期公告序列
+        描述：【教师】两个表格分别为过期公告和未过期公告表
+    　　　    【学生】一个表格未过期公告表
+        """
+
+        def __init__(self):
+            NoteTable.__init__(self)
+            self.lay.addWidget(self.CurrentNote(),1,0,5,5)
+            self.lay.addWidget(self.PreviousNote(),1,5,5,5)
+
+        class CurrentNote(Page):
+            """
+            未过期的公告表
+            """
+
+            def __init__(self):
+                Page.__init__(self)
+
+
+        class PreviousNote(Page):
+            """
+            过期的公告表
+            """
+
+            def __init__(self):
+                Page.__init__(self)
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
