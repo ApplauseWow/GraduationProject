@@ -1,5 +1,6 @@
 # -*-coding:utf-8-*-
 import pymysql
+from TypesEnum import *
 
 
 class DBC(object):
@@ -58,16 +59,19 @@ class DBC(object):
         """
         添加新用户
         :param user_info_dict:
-        :return:
+        :return:DBOperation().
         """
 
+        sql = "DELETE FROM `user_info` WHERE `user_id`='201610414206';"
 
 
 
 if __name__ == '__main__':
     try:
         db = DBC()
-        print db.get_all_info('user_info', (2, 3))
+        a = db.get_all_info('user_info', (0, 3))
+        for i in a:
+            print i[4] == None
     except Exception as e:
         print(e)
         db = None
