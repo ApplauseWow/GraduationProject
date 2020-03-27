@@ -52,27 +52,53 @@ class DBC(object):
             users = None
         finally:
             cursor.close()
-        return users
+        return users  # 返回None为出错 ()为没有记录
 
     # user_info表
-    def insert_user(self, user_info_dict):
+    def insert_user(self, user_info_dict=None):
         """
         添加新用户
         :param user_info_dict:
         :return:DBOperation().
         """
 
-        sql = "DELETE FROM `user_info` WHERE `user_id`='201610414206';"
+        sql = "INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `email`) " \
+                                        "VALUES (%s, %s, %s, %s, %s, %s);"
+        cursor = self.conn.cursor()
+        try:
+            row = cursor.execute(sql,( 9, 9, 9, 0, None, '163'))
+            if row == 1:
+                self.conn.commit()  # 必须提交事务才能生效
+                return DBOperation.Success
+            else:
+                return DBOperation.Failure
+        except Exception as e:
+            print(e)
+            return DBOperation.Failure
+        finally:
+            cursor.close()
 
+
+'''
+DELETE FROM `user_info` WHERE `user_id`='201610414206';
+INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `email`) VALUES ('12', '21', '21', '2', NULL, NULL);
+
+
+'''
 
 
 if __name__ == '__main__':
     try:
         db = DBC()
         a = db.get_all_info('user_info', (0, 3))
+        print len(a)
+        print(a == ())
         for i in a:
-            print i[4] == None
+            print(i)
+        # b = db.insert_user()
+        # print(b)
     except Exception as e:
         print(e)
         db = None
+
 
