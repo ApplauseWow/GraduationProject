@@ -53,9 +53,9 @@ class DBC(object):
         """
 
         if start_end is ():  # 不需要分页
-            sql = 'select * from {};'.format(table)
+            sql = "select * from %s;" % table
         else:  # 需要分页
-            sql = 'select * from {} limit {}, {}'.format(table, start_end[0], start_end[1])
+            sql = "select * from %s limit %s, %s;" % (table, start_end[0], start_end[1])
         cursor = self.conn.cursor()
         try:
             cursor.execute(sql)
@@ -68,15 +68,15 @@ class DBC(object):
         return users  # 返回None为出错 ()为没有记录
 
     # user_info表
-    def insert_user(self, user_info_dict=None):
+    def insert_record(self, table, para_dict=None):
         """
-        添加新用户
-        :param user_info_dict:
+        添加新记录
+        :param table: 表
+        :param para_dict: 数据字典
         :return:DBOperation().
         """
 
-        sql = "INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `email`) " \
-              "VALUES (%s, %s, %s, %s, %s, %s);"
+        sql = ""
         cursor = self.conn.cursor()
         try:
             row = cursor.execute(sql,( 9, 9, 9, 0, None, '163'))
@@ -92,24 +92,16 @@ class DBC(object):
             cursor.close()
 
 
-'''
-DELETE FROM `user_info` WHERE `user_id`='201610414206';
-INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `email`) VALUES ('12', '21', '21', '2', NULL, NULL);
-
-
-'''
-
-
 if __name__ == '__main__':
     try:
         db = DBC('192.168.2.104')
-        a = db.get_all_info('user_info', (0, 3))
+        a = db.get_all_info("user_info", (0, 3))
         print len(a)
         print(a == ())
         for i in a:
             print(i)
-        b = db.insert_user()
-        print(b)
+        # b = db.insert_user()
+        # print(b)
     except Exception as e:
         print(e)
         db = None

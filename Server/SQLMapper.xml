@@ -1,0 +1,46 @@
+<sql>
+    <table name="user_info">
+        <insert>INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `email`) VALUES (%s, %s, %s, %s, %s, %s);</insert>
+        <delete>DELETE FROM `user_info` WHERE `user_id`=%s;</delete>
+    </table>
+    <table name="achievement_info">
+        <insert>INSERT INTO `achievement_info` ( `user_id`, `ach_name`, `ach_type`) VALUES (%s, %s, %s);</insert>
+        <delete>DELETE FROM `achievement_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="attendance_record">
+         <delete>DELETE FROM `attendance_record` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="competition_info">
+        <delete>DELETE FROM `competition_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="competition_member">
+        <delete>DELETE FROM `competition_member` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="facility_info">
+        <delete>DELETE FROM `facility_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="group_info">
+        <delete>DELETE FROM `group_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="group_member">
+        <delete>DELETE FROM `group_member` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="leave_permit_info">
+        <delete>DELETE FROM `leave_permit_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="note_info">
+        <delete>DELETE FROM `note_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="project_info">
+        <delete>DELETE FROM `project_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="seat_arrangement">
+        <delete>DELETE FROM `seat_arrangement` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="seat_info">
+        <delete>DELETE FROM `seat_info` WHERE `ach_id`=%s;</delete>
+    </table>
+    <table name="self_task">
+        <delete>DELETE FROM `self_task` WHERE `ach_id`=%s;</delete>
+    </table>
+</sql>
