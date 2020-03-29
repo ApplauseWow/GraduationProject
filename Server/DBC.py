@@ -1,5 +1,9 @@
 # -*-coding:utf-8-*-
 import pymysql
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 from TypesEnum import *
 
 
@@ -8,23 +12,32 @@ class DBC(object):
     数据库交互
     """
 
-    def __init__(self):
+    def __init__(self, client_ip):
+        tree = ET.parse("./ClientMapper.xml")  # 解析数据库信息xml
+        root = tree.getroot()  # 获取根节点
+        client_info = dict()  # 客户端映射信息
+        res = filter(lambda x: x.get('c_ip') == client_ip, root.findall('client'))  # 查找对应客户端信息
+        if res == []:  # 未查到对应的客户端信息
+            raise Exception("No such a client info!")
+        else:  # 已查到
+            for pair in res[0].items():
+                client_info[pair[0]] = pair[1]
         try:
-            self.conn = pymysql.connect(host = '118.89.37.200',
-                                        user = 'gpdb_user',
-                                        db = 'gpdb',
-                                        port = 3306,
-                                        password='123qwe',
-                                        charset = 'utf8',
+            self.conn = pymysql.connect(host=client_info['host'],
+                                        user=client_info['user'],
+                                        db=client_info['db'],
+                                        port=int(client_info['port']),
+                                        password=client_info['pwd'],
+                                        charset='utf8',
                                         connect_timeout = 5
                                         )
         except Exception as e:
-            raise Exception("fail to connect!")
             self.conn = None
+            raise Exception("fail to connect to the DB!")
 
     def close_connect(self):
         """
-        关闭连接
+        关闭数据库连接
         :return:None
         """
 
@@ -39,9 +52,9 @@ class DBC(object):
         :return: (info),(...
         """
 
-        if start_end is ():
+        if start_end is ():  # 不需要分页
             sql = 'select * from {};'.format(table)
-        else:
+        else:  # 需要分页
             sql = 'select * from {} limit {}, {}'.format(table, start_end[0], start_end[1])
         cursor = self.conn.cursor()
         try:
@@ -63,16 +76,16 @@ class DBC(object):
         """
 
         sql = "INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `email`) " \
-                                        "VALUES (%s, %s, %s, %s, %s, %s);"
+              "VALUES (%s, %s, %s, %s, %s, %s);"
         cursor = self.conn.cursor()
         try:
             row = cursor.execute(sql,( 9, 9, 9, 0, None, '163'))
-            if row == 1:
+            if row == 1:  # 插入成功
                 self.conn.commit()  # 必须提交事务才能生效
                 return DBOperation.Success
-            else:
+            else:  # 插入失败
                 return DBOperation.Failure
-        except Exception as e:
+        except Exception as e:  # 插入失败
             print(e)
             return DBOperation.Failure
         finally:
@@ -89,16 +102,17 @@ INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `emai
 
 if __name__ == '__main__':
     try:
-        db = DBC()
+        db = DBC('192.168.2.104')
         a = db.get_all_info('user_info', (0, 3))
         print len(a)
         print(a == ())
         for i in a:
             print(i)
-        # b = db.insert_user()
-        # print(b)
+        b = db.insert_user()
+        print(b)
     except Exception as e:
         print(e)
         db = None
+
 
 
