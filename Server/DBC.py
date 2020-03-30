@@ -46,7 +46,8 @@ class DBC(object):
         else:
             pass
 
-    def get_all_info(self, table, start_end = ()):
+    # 一般查询操作
+    def search_record(self, table, start_end = ()):
         """
         获取表所有信息
         :return: (info),(...
@@ -67,25 +68,29 @@ class DBC(object):
             cursor.close()
         return users  # 返回None为出错 ()为没有记录
 
-    # user_info表
-    def insert_record(self, table, para_dict=None):
+    # 一般增删改操作
+    def modify_record(self, op, table, para_dict=None):
         """
         添加新记录
+        :param op: 操作->insert | delete | update
         :param table: 表
         :param para_dict: 数据字典
         :return:DBOperation().
         """
 
-        sql = ""
+        tree = ET.parse("./SQLMapper.xml")
+        root = tree.getroot()
+        res = filter(lambda x: x.get('name') == table, root.findall('table'))  # 找到table的sql
+        sql = res[0].find(op).text
         cursor = self.conn.cursor()
         try:
-            row = cursor.execute(sql,( 9, 9, 9, 0, None, '163'))
-            if row == 1:  # 插入成功
+            row = cursor.execute(sql,para_dict)
+            if row == 1:  # 操作成功
                 self.conn.commit()  # 必须提交事务才能生效
                 return DBOperation.Success
-            else:  # 插入失败
+            else:  # 操作失败
                 return DBOperation.Failure
-        except Exception as e:  # 插入失败
+        except Exception as e:  # 操作失败
             print(e)
             return DBOperation.Failure
         finally:
@@ -95,13 +100,20 @@ class DBC(object):
 if __name__ == '__main__':
     try:
         db = DBC('192.168.2.104')
-        a = db.get_all_info("user_info", (0, 3))
-        print len(a)
-        print(a == ())
-        for i in a:
-            print(i)
-        # b = db.insert_user()
-        # print(b)
+        # a = db.get_all_info("user_info", (0, 3))
+        # print len(a)
+        # print(a == ())
+        # for i in a:
+        #     print(i)
+        d= dict()
+        d['user_id'] = 1
+        d['grade'] = 1
+        d['_class'] = 1
+        d['email'] = '1'
+        d['tel'] = '1'
+        d['user_type'] = 1
+        b = db.modify_record('insert', 'user_info', d)
+        print(b)
     except Exception as e:
         print(e)
         db = None
