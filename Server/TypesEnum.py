@@ -4,16 +4,29 @@ from enum import unique
 
 
 @unique
-class UserType(Enum):
+class ClientRequest(Enum):
     """
-    user_info表　user_tyoe
-    用户类型枚举类
-    0:学生 1:教师
+    前后端通信交互接口
+    客户端请求成功与否枚举类
+    0:请求失败 1:请求成功
     """
 
-    Student = 0
+    Failure = 0
 
-    Teacher = 1
+    Success = 1
+
+
+@unique
+class ProcessOperation(Enum):
+    """
+    非数据库相关的其他处理加工操作交互接口
+    非数据库相关的其他处理加工操作成功与否枚举类
+    0:操作失败 1:操作成功
+    """
+
+    Failure = 0
+
+    Success = 1
 
 
 @unique
@@ -27,6 +40,19 @@ class DBOperation(Enum):
     Failure = 0
 
     Success = 1
+
+
+@unique
+class UserType(Enum):
+    """
+    user_info表　user_tyoe
+    用户类型枚举类
+    0:学生 1:教师
+    """
+
+    Student = 0
+
+    Teacher = 1
 
 
 @unique
