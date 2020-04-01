@@ -1,5 +1,5 @@
 <clientss>
     <client c_ip="192.168.2.104" host="118.89.37.200" user="gpdb_user" db="gpdb" pwd="123qwe" port="3306" />
-
-
+    <client c_ip="127.0.0.0" host="118.89.37.200" user="gpdb_user" db="gpdb" pwd="123qwe" port="3306" />
+    <client c_ip="localhost" host="118.89.37.200" user="gpdb_user" db="gpdb" pwd="123qwe" port="3306" />
 </clientss>
