@@ -1,5 +1,5 @@
 // [python quickstart](https://grpc.io/docs/quickstart/python.html#run-a-grpc-application)
-// python -m grpc_tools.protoc --python_out=. --grpc_python_out=. -I. server.proto
+// python -m grpc_tools.protoc --python_out=. --grpc_python_out=. -I. correspondence.proto
 
 // backend.proto
 syntax = "proto3";
