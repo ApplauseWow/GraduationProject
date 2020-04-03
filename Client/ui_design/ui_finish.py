@@ -686,7 +686,7 @@ class Pagination(QWidget):
         # 总记录数
         self.totalRecordCount = 0
         # 每页记录数
-        self.pageRecordCount = 4
+        self.pageRecordCount = 18
 
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)

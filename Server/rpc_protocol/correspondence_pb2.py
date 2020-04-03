@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x14\x63orrespondence.proto\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04para\x18\x01 \x01(\x0c\"\x1f\n\rHelloResponse\x12\x0e\n\x06result\x18\x01 \x01(\x0c\x32h\n\x07\x42\x61\x63kend\x12+\n\x08SayHello\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12\x30\n\rSayHelloAgain\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x14\x63orrespondence.proto\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04para\x18\x01 \x01(\x0c\"\x1f\n\rHelloResponse\x12\x0e\n\x06result\x18\x01 \x01(\x0c\"\"\n\rRequestStruct\x12\x11\n\tparameter\x18\x01 \x01(\x0c\" \n\x0eResponseStruct\x12\x0e\n\x06result\x18\x01 \x01(\x0c\x32\xb1\x02\n\x07\x42\x61\x63kend\x12+\n\x08SayHello\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12\x30\n\rSayHelloAgain\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12\x30\n\x0bGetAllNotes\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12/\n\nGetTheNote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12\x30\n\x0bInsertANote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12\x32\n\rModifyTheNote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x62\x06proto3'
 )
 
 
@@ -85,8 +85,72 @@ _HELLORESPONSE = _descriptor.Descriptor(
   serialized_end=85,
 )
 
+
+_REQUESTSTRUCT = _descriptor.Descriptor(
+  name='RequestStruct',
+  full_name='RequestStruct',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='parameter', full_name='RequestStruct.parameter', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=87,
+  serialized_end=121,
+)
+
+
+_RESPONSESTRUCT = _descriptor.Descriptor(
+  name='ResponseStruct',
+  full_name='ResponseStruct',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='result', full_name='ResponseStruct.result', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=123,
+  serialized_end=155,
+)
+
 DESCRIPTOR.message_types_by_name['HelloRequest'] = _HELLOREQUEST
 DESCRIPTOR.message_types_by_name['HelloResponse'] = _HELLORESPONSE
+DESCRIPTOR.message_types_by_name['RequestStruct'] = _REQUESTSTRUCT
+DESCRIPTOR.message_types_by_name['ResponseStruct'] = _RESPONSESTRUCT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 HelloRequest = _reflection.GeneratedProtocolMessageType('HelloRequest', (_message.Message,), {
@@ -103,6 +167,20 @@ HelloResponse = _reflection.GeneratedProtocolMessageType('HelloResponse', (_mess
   })
 _sym_db.RegisterMessage(HelloResponse)
 
+RequestStruct = _reflection.GeneratedProtocolMessageType('RequestStruct', (_message.Message,), {
+  'DESCRIPTOR' : _REQUESTSTRUCT,
+  '__module__' : 'correspondence_pb2'
+  # @@protoc_insertion_point(class_scope:RequestStruct)
+  })
+_sym_db.RegisterMessage(RequestStruct)
+
+ResponseStruct = _reflection.GeneratedProtocolMessageType('ResponseStruct', (_message.Message,), {
+  'DESCRIPTOR' : _RESPONSESTRUCT,
+  '__module__' : 'correspondence_pb2'
+  # @@protoc_insertion_point(class_scope:ResponseStruct)
+  })
+_sym_db.RegisterMessage(ResponseStruct)
+
 
 
 _BACKEND = _descriptor.ServiceDescriptor(
@@ -111,8 +189,8 @@ _BACKEND = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=87,
-  serialized_end=191,
+  serialized_start=158,
+  serialized_end=463,
   methods=[
   _descriptor.MethodDescriptor(
     name='SayHello',
@@ -130,6 +208,42 @@ _BACKEND = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_HELLOREQUEST,
     output_type=_HELLORESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetAllNotes',
+    full_name='Backend.GetAllNotes',
+    index=2,
+    containing_service=None,
+    input_type=_REQUESTSTRUCT,
+    output_type=_RESPONSESTRUCT,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetTheNote',
+    full_name='Backend.GetTheNote',
+    index=3,
+    containing_service=None,
+    input_type=_REQUESTSTRUCT,
+    output_type=_RESPONSESTRUCT,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='InsertANote',
+    full_name='Backend.InsertANote',
+    index=4,
+    containing_service=None,
+    input_type=_REQUESTSTRUCT,
+    output_type=_RESPONSESTRUCT,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='ModifyTheNote',
+    full_name='Backend.ModifyTheNote',
+    index=5,
+    containing_service=None,
+    input_type=_REQUESTSTRUCT,
+    output_type=_RESPONSESTRUCT,
     serialized_options=None,
   ),
 ])

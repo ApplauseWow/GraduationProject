@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QApplication
 
 from ui_design.ui_finish import *
 from TypesEnum import *
+from ClientRequest import CR
 
 
 class Page(Pagination):
@@ -150,8 +151,12 @@ class Warning(WarningWindow):
     警告提醒窗
     """
 
-    def __init__(self):
+    def __init__(self, words=None):
         super(Warning, self).__init__()
+        if words:
+            self.words.setText(words)
+        else:
+            pass
         # 设置定时器
         self.time_count = QTimer()
         self.time_count.setInterval(1500)
@@ -227,13 +232,13 @@ class Management(ManagementWindow):
 
         def __init__(self, user_id, user_type):
             NoteTable.__init__(self)
-            if UserType(int(user_type)) is UserType.Teacher:  # 教师
+            if UserType(int(user_type)) == UserType.Teacher:  # 教师
                 self.lay.addWidget(self.CurrentNote(), 2, 0, 5, 5)  # 未过期公告表
                 self.lay.addWidget(self.PreviousNote(), 2, 5, 5, 5)  # 过期公告表
                 self.lay.setRowStretch(1, 1)
                 self.lay.setRowStretch(3, 4)
                 self.lay.setRowStretch(7, 1)
-            elif UserType(int(user_type)) is UserType.Student:  # 学生
+            elif UserType(int(user_type)) == UserType.Student:  # 学生
                 self.lay.addWidget(self.CurrentNote(), 2, 0, 5, 5)
                 self.bt_insert.hide()
                 self.l_previous_note.hide()
@@ -246,16 +251,28 @@ class Management(ManagementWindow):
             未过期的公告表
             """
 
-            def __init__(self):
+            def __init__(self, user_type):
                 Page.__init__(self)
+                self.user_type = user_type
 
             def queryRecord(self, limitIndex):
                 """
                 重写查询记录
-                :param limitIndex:
+                :param limitIndex:从第limitIndex条开始
                 :return:
                 """
 
+                try:
+                    CR().GetAllNotesRequest(limitIndex, self.pageRecordCount)
+                    """
+                    待完成
+                    分权限显示操作列
+                    添加记录...
+                    coding...
+                    """
+                except Exception as e:
+                    warning = Warning(words=u"请求失败！")
+                    warning.show()
 
         class PreviousNote(Page):
             """
