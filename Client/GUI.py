@@ -5,6 +5,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
 
 from ui_design.ui_finish import *
+from TypesEnum import *
 
 
 class Page(Pagination):
@@ -14,7 +15,7 @@ class Page(Pagination):
     """
 
     def __init__(self):
-        super(Page, self).__init__()
+        Pagination.__init__(self)
 
     def setUpConnect(self):
         """
@@ -38,10 +39,10 @@ class Page(Pagination):
         self.table.horizontalHeader().setFixedHeight(30)
         self.table.verticalHeader().setVisible(False)
         self.table.setColumnCount(5)
-        self.table.setRowCount(self.pageRecordCount + 20)
+        self.table.setRowCount(self.pageRecordCount)
         # self.table.setHorizontalHeaderLabels(['id', u'标题', u'内容', u'操作'])
         # self.table.setColumnHidden(0, True)  # 隐藏某列
-        for j in range(100):
+        for j in range(20):
             for i in range(5):
                 item = QTableWidgetItem(str(i))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -192,7 +193,7 @@ class Management(ManagementWindow):
     def __init__(self, user_id, user_type):
         super(Management, self).__init__(user_id, user_type)
         # 添加顺序一定按照按钮顺序
-        self.right_layout.addWidget(self.ShowNotes())  # ！？可能存在切换后切回不是初始状态
+        self.right_layout.addWidget(self.ShowNotes(user_id=user_id, user_type=user_type))  # ！？可能存在切换后切回不是初始状态
         self.setUpConnect()
 
     def setUpConnect(self):
@@ -224,10 +225,21 @@ class Management(ManagementWindow):
     　　　    【学生】一个表格未过期公告表
         """
 
-        def __init__(self):
+        def __init__(self, user_id, user_type):
             NoteTable.__init__(self)
-            self.lay.addWidget(self.CurrentNote(),1,0,5,5)
-            self.lay.addWidget(self.PreviousNote(),1,5,5,5)
+            if UserType(int(user_type)) is UserType.Teacher:  # 教师
+                self.lay.addWidget(self.CurrentNote(), 2, 0, 5, 5)  # 未过期公告表
+                self.lay.addWidget(self.PreviousNote(), 2, 5, 5, 5)  # 过期公告表
+                self.lay.setRowStretch(1, 1)
+                self.lay.setRowStretch(3, 4)
+                self.lay.setRowStretch(7, 1)
+            elif UserType(int(user_type)) is UserType.Student:  # 学生
+                self.lay.addWidget(self.CurrentNote(), 2, 0, 5, 5)
+                self.bt_insert.hide()
+                self.l_previous_note.hide()
+                self.lay.setRowStretch(1, 1)
+                self.lay.setRowStretch(3, 4)
+                self.lay.setRowStretch(7, 1)
 
         class CurrentNote(Page):
             """
@@ -236,6 +248,13 @@ class Management(ManagementWindow):
 
             def __init__(self):
                 Page.__init__(self)
+
+            def queryRecord(self, limitIndex):
+                """
+                重写查询记录
+                :param limitIndex:
+                :return:
+                """
 
 
         class PreviousNote(Page):
@@ -250,7 +269,7 @@ class Management(ManagementWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = Management(201610414206, 1)
+    win_ = Management(201610414206, 0)
     win_.show()
     # win1 = SysHome()
     # win2 = MyInfo()

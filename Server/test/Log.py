@@ -20,3 +20,4 @@ def log(func):
                 f.write(record)
             return res
     return wrapper
+

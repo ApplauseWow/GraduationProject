@@ -281,7 +281,7 @@ class ManagementWindow(QDialog):
 "                   border-radius:20px;                "
 "                   border-color:rgba(255,165,0,100);   "
 "                   font:bold 23px;                    "
-"                   color:rgba(255,165,0,255);                "
+"                   color:rgba(255,165,0,130);                "
 "                   padding:6px;                      "
                              "text-align:left"
 "                   }"
@@ -306,6 +306,7 @@ class ManagementWindow(QDialog):
 
         self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口
         self.showFullScreen()
+        # self.setGeometry(0, 0, 1048, 890)
 
 
 class NoteTable(QWidget):
@@ -319,10 +320,14 @@ class NoteTable(QWidget):
         # 布局
         self.lay = QGridLayout()
         # 添加控件
-        self.l_current_note = QLabel()
-        self.l_previous_note = QLabel()
-        self.lay.addWidget(self.l_current_note, 0, 0, 1, 5)
-        self.lay.addWidget(self.l_previous_note, 0, 5, 1, 5)
+        self.l_current_note = QPushButton(u"最新公告")
+        self.l_current_note.setEnabled(False)
+        self.l_previous_note = QPushButton(u"过期公告")
+        self.l_previous_note.setEnabled(False)
+        self.bt_insert = QPushButton(u'添加新公告')
+        self.lay.addWidget(self.l_current_note, 0, 0, 2, 1)
+        self.lay.addWidget(self.bt_insert, 0, 4, 2, 1)
+        self.lay.addWidget(self.l_previous_note, 0, 5, 2, 1)
         # 最后self添加布局
         self.setLayout(self.lay)
         self.setUpCSS()
@@ -333,14 +338,25 @@ class NoteTable(QWidget):
         :return: None
         """
 
-        self.l_current_note.setText(u"最新公告")
-        self.l_previous_note.setText(u"过期公告")
         map(lambda x: x.setObjectName("note_label"), [self.l_previous_note, self.l_current_note])
+        self.bt_insert.setObjectName("bt_insert")
         self.setStyleSheet('''
-            QLabel#note_label{
+            QPushButton#note_label{
                 font: 24px;
                 color:black;
-                border: 3px solid orange
+                border:none;
+                background-color:white;
+                border-left: 10px solid orange;
+                border-bottom:2px solid orange;
+            }
+            
+            QPushButton#bt_insert{
+                background-color:orange;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:white;
+                font: bold 18px;
             }
         ''')
 

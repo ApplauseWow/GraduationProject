@@ -5,13 +5,16 @@ import grpc
 import helloworld_pb2
 import helloworld_pb2_grpc
 import pickle
+from CallMethodImplement import *
 
 # 实现 proto 文件中定义的 GreeterServicer
 class Greeter(helloworld_pb2_grpc.GreeterServicer):
     # 实现 proto 文件中定义的 rpc 调用
     def SayHello(self, request, context):
         ip = str(context.peer()).split(':')[1]
-        return helloworld_pb2.HelloReply(message = pickle.dumps('hello {msg}'.format(msg = ip)))
+        data = {'name':request.name, 'a':1, 'b':[1,2]}
+        res = SayHelloImplement(ip=ip, data=data)
+        return helloworld_pb2.HelloReply(message = pickle.dumps(res))
 
     def SayHelloAgain(self, request, context):
         return helloworld_pb2.HelloReply(message= pickle.dumps('hello {msg}'.format(msg = context.peer())))
