@@ -5,13 +5,15 @@
 syntax = "proto3";
 
 service Backend {
-    // the demo for test
+    // 测试接口
     rpc SayHello(HelloRequest) returns (HelloResponse) {}
     rpc SayHelloAgain(HelloRequest) returns (HelloResponse) {}
 
-    // main interface
-    // ->interface on database interaction
-    // ->->on note table
+    // 正式接口
+    // ->数据交互相关接口
+    // ->->共用接口
+    rpc GetRecordsCount(RequestStruct) returns (ResponseStruct) {} //获取记录条数
+    // ->->公告相关接口
     rpc GetAllNotes(RequestStruct) returns (ResponseStruct) {} // 教师学生共用，通过角色类型划分权限
     rpc GetTheNote(RequestStruct) returns (ResponseStruct) {} // 教师学生共用，通过id获取
     rpc InsertANote(RequestStruct) returns (ResponseStruct) {} // 教师专用
@@ -22,9 +24,8 @@ service Backend {
 }
 
 
-// to avoid some trouble, all data will be serialized before transmission and anti-serialized after transmission
-// will be serialized and anti-serialized by module `pickle`
-// data structure for test
+// 为了避免麻烦，利用pickle模块在数据传输前和传输后分别序列化和反序列化为字节流
+// 测试数据结构
 message HelloRequest {
     bytes para = 1;
 }
@@ -33,7 +34,7 @@ message HelloResponse {
     bytes result = 1;
 }
 
-// main data structure
+// 正式数据结构
 message RequestStruct {
     bytes para = 1;
 }

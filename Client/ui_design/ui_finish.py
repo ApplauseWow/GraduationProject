@@ -686,10 +686,15 @@ class Pagination(QWidget):
         # 总记录数
         self.totalRecordCount = 0
         # 每页记录数
-        self.pageRecordCount = 18
+        self.pageRecordCount = 8
 
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置表格不可修改
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 选中时选一行
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.horizontalHeader().setFixedHeight(35)
+        self.table.verticalHeader().setVisible(False)
         self.layout.addWidget(self.table)
 
         hLayout = QHBoxLayout()
@@ -716,9 +721,6 @@ class Pagination(QWidget):
         self.setLayout(self.layout)
         self.resize(200, 300)
 
-        self.initializedModel()
-        self.setUpConnect()
-        self.updateStatus()
         self.setUpCSS()
 
     def setUpCSS(self):
@@ -754,5 +756,39 @@ class Pagination(QWidget):
                 border-bottom:2px solid orange
             }
             ''')
+
+
+class OperationButtonInTable(QPushButton):
+
+    def __init__(self, color='LightCoral', name=u'操作'):
+        QPushButton.__init__(self)
+        self.setText(name)
+        self.setStyleSheet('''
+            QPushButton{
+                text-align : center;
+                background-color : %(color)s;
+                border: 3px solid %(color)s;
+                border-radius:5px;
+                font : bold 18px;
+                color: white;
+            }
+            QPushButton:pressed{
+                text-align : center;
+                background-color : white;
+                border: 3px solid %(color)s;
+                border-radius:5px;
+                font : bold 18px;
+                color: %(color)s;
+            }
+            QPushButton:hover{
+                text-align : center;
+                background-color : white;
+                border: 3px solid %(color)s;
+                border-radius:5px;
+                font : bold 18px;
+                color: %(color)s;
+            }
+        '''%({'color':color}))
+
 
 

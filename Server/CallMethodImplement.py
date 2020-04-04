@@ -28,6 +28,23 @@ class CallMethodImplement(object):
         return d
 
     @log
+    def GetRecordsCount(self, ip, data):
+        """
+        获取总记录条数
+        :param ip: 用于识别客户端
+        :param data: 请求参数
+        :return: dict{'operation': , 'exception': , 'result': }
+        """
+
+        try:
+            conn = DBC(client_ip=ip)
+            res = conn.count_record(data['table'])
+            res['operation'] = self._operation_mapper[res['operation']]
+            return res
+        except Exception as e:
+            return {'operation':ClientRequest.Failure, 'exception':e, 'result': None}
+
+    @log
     def GetAllNotes(self, ip, data):
         """
         获取所有公告

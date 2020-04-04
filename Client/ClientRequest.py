@@ -20,7 +20,7 @@ class CR(object):
         self.channel = grpc.insecure_channel(self._host)
         self.stub = correspondence_pb2_grpc.BackendStub(self.channel)
 
-    def _CloseChannnel(self):
+    def CloseChannnel(self):
         self.channel.close()
 
     def SayHelloRequest(self):
@@ -31,6 +31,25 @@ class CR(object):
 
         response = self.stub.SayHello(correspondence_pb2.HelloRequest(para=pickle.dumps('test')))
         print(pickle.loads(response.result), type(response.result))
+
+    def GetNotesCountRequest(self, table):
+        """
+        获取总记录条数
+        :param table: 表名　不应该暴露表名　修改！！！
+        :return: 条数
+        """
+
+        try:
+            data = {'table': table}
+            response = self.stub.GetRecordsCount(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:  # 请求失败
+                return 0
+            elif res['operation'] == ClientRequest.Success:  # 请求成功
+                return res['result']
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
 
     def GetAllNotesRequest(self, start=None, num=None):
         """
@@ -51,9 +70,11 @@ class CR(object):
         except Exception as e:  # 界面捕捉异常并弹出警告窗口
             print(e)
             raise Exception('fail to request!')
-        finally:
-            self._CloseChannnel()
 
+
+if __name__ == '__main__':
+    conn = CR()
+    print conn.GetAllNotesRequest()
 
 
 

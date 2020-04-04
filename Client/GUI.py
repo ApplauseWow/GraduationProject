@@ -1,9 +1,5 @@
 # -*-coding:utf-8-*-
-import time
 import sys
-from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication
-
 from ui_design.ui_finish import *
 from TypesEnum import *
 from ClientRequest import CR
@@ -17,6 +13,7 @@ class Page(Pagination):
 
     def __init__(self):
         Pagination.__init__(self)
+        # 在继承重写后再执行以下初始化函数
 
     def setUpConnect(self):
         """
@@ -26,6 +23,7 @@ class Page(Pagination):
         self.prevButton.clicked.connect(self.onPrevPage)
         self.nextButton.clicked.connect(self.onNextPage)
         self.switchPageButton.clicked.connect(self.onSwitchPage)
+        self.table.clicked.connect(self.showRecord)
 
     def initializedModel(self):
         """
@@ -33,21 +31,7 @@ class Page(Pagination):
         :return:
         """
 
-        # 测试表格
-        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置表格不可修改
-        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 选中时选一行
-        self.table.setFrameShape(QFrame.NoFrame)
-        self.table.horizontalHeader().setFixedHeight(30)
-        self.table.verticalHeader().setVisible(False)
-        self.table.setColumnCount(5)
-        self.table.setRowCount(self.pageRecordCount)
-        # self.table.setHorizontalHeaderLabels(['id', u'标题', u'内容', u'操作'])
-        # self.table.setColumnHidden(0, True)  # 隐藏某列
-        for j in range(20):
-            for i in range(5):
-                item = QTableWidgetItem(str(i))
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.table.setItem(j, i, item)
+        pass
 
     def queryRecord(self, limitIndex):
         """
@@ -55,6 +39,7 @@ class Page(Pagination):
         :param limitIndex:开头记录位置
         :return:
         """
+
         pass
 
     def onPrevPage(self):
@@ -89,14 +74,20 @@ class Page(Pagination):
         pattern = re.compile('^[0-9]+$')
         match = pattern.match(szText)
         if not match:
-            QMessageBox.information(self, "提示", "请输入数字.")
+            # QMessageBox.information(self, "提示", "请输入数字.")
+            msg = Warning(words=u"请输入数字")
+            msg.exec_()
             return
         if szText == "":
-            QMessageBox.information(self, "提示", "请输入跳转页面.")
+            # QMessageBox.information(self, "提示", "请输入跳转页面.")
+            msg = Warning(words=u"请输入跳转页面")
+            msg.exec_()
             return
         pageIndex = int(szText)
         if pageIndex > self.totalPage or pageIndex < 1:
-            QMessageBox.information(self, "提示", "没有指定的页，清重新输入.")
+            # QMessageBox.information(self, "提示", "没有指定的页，清重新输入.")
+            msg = Warning(words=u"没有指定的页，清重新输入")
+            msg.exec_()
             return
 
         limitIndex = (pageIndex - 1) * self.pageRecordCount
@@ -122,6 +113,60 @@ class Page(Pagination):
         else:
             self.nextButton.setEnabled(True)
 
+    def showRecord(self):
+        """
+        双击表格显示具体记录信息，待重写
+        :return:
+        """
+
+        pass
+
+    def addRecords(self, col_list, data):
+        """
+        添加记录
+        :param col_list:[(colname, is_hidden, is_pk), ...]
+        :return: None
+        """
+
+        self.table.clearContents()  # 清空内容
+        self.table.setColumnCount(len(col_list))
+        self.table.setRowCount(self.pageRecordCount)
+        self.table.setHorizontalHeaderLabels(map(lambda x: x['name'], col_list))  # 设置表头
+        map(lambda x: self.table.setColumnHidden(x[0], x[1]['is_hidden']), enumerate(col_list))  # 隐藏某些列
+        for num_r, row in enumerate(data):
+            pk = []
+            self.table.setRowHeight(num_r, 50)
+            for num_c, col in enumerate(col_list):
+                if col['is_pk']:  # 添加主键
+                   pk.append(row[num_c])
+                if col['name'] == u'操作':  # 操作栏
+                    self.table.setCellWidget(num_r, num_c, self.addOperationButton(pk))
+                else:  # 普通字段
+                    item = QTableWidgetItem(str(row[num_c]))
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.table.setItem(num_r, num_c, item)
+
+    def addOperationButton(self, primay_key):
+        """
+        添加操作按钮，待重写
+        :return:
+        """
+        widget = QWidget()
+        bt = OperationButtonInTable(name=u'作废')
+        bt.clicked.connect(lambda : self.operationOnBtClicked(primay_key))
+        hLayout = QHBoxLayout()
+        hLayout.addWidget(bt)
+        widget.setLayout(hLayout)
+        return widget
+
+    def operationOnBtClicked(self, primary_key):
+        """
+        操作按钮槽函数，待重写
+        :param primary_key:　主键
+        :return:
+        """
+        
+        pass
 
 class SysHome(MainWindow):
     """
@@ -222,6 +267,7 @@ class Management(ManagementWindow):
         except:
             pass
 
+    # 以下为内部组件类
     class ShowNotes(NoteTable):
         """
         继承NoteTable封装业务逻辑
@@ -233,13 +279,13 @@ class Management(ManagementWindow):
         def __init__(self, user_id, user_type):
             NoteTable.__init__(self)
             if UserType(int(user_type)) == UserType.Teacher:  # 教师
-                self.lay.addWidget(self.CurrentNote(), 2, 0, 5, 5)  # 未过期公告表
+                self.lay.addWidget(self.CurrentNote(user_type), 2, 0, 5, 5)  # 未过期公告表
                 self.lay.addWidget(self.PreviousNote(), 2, 5, 5, 5)  # 过期公告表
                 self.lay.setRowStretch(1, 1)
                 self.lay.setRowStretch(3, 4)
                 self.lay.setRowStretch(7, 1)
             elif UserType(int(user_type)) == UserType.Student:  # 学生
-                self.lay.addWidget(self.CurrentNote(), 2, 0, 5, 5)
+                self.lay.addWidget(self.CurrentNote(user_type), 2, 0, 5, 5)
                 self.bt_insert.hide()
                 self.l_previous_note.hide()
                 self.lay.setRowStretch(1, 1)
@@ -253,10 +299,37 @@ class Management(ManagementWindow):
 
             def __init__(self, user_type):
                 Page.__init__(self)
-                self.user_type = user_type
+                self.col_list = [
+                    {'name': 'id', 'is_hidden': True, 'is_pk': True},
+                    {'name': u'标题', 'is_hidden': False, 'is_pk': False},
+                    {'name': u'内容', 'is_hidden': False, 'is_pk': False},
+                    {'name': u'发布日期', 'is_hidden': False, 'is_pk': False},
+                    {'name': 'is_valid', 'is_hidden': True, 'is_pk': False},
+                ]  # 必须按照数据字段顺序
+                if UserType(user_type) == UserType.Teacher:
+                    self.col_list.append({'name': u'操作', 'is_hidden': False, 'is_pk': False})
+                self.initializedModel()
+                self.setUpConnect()
+                self.updateStatus()
 
             def initializedModel(self):
-                pass
+                try:
+                    conn = CR()
+                    notes = conn.GetAllNotesRequest(0, self.pageRecordCount)['valid']
+                    self.totalRecordCount = len(notes)
+                    if self.totalRecordCount % self.pageRecordCount == 0:
+                        if self.totalRecordCount != 0:
+                            self.totalPage = self.totalRecordCount / self.pageRecordCount
+                        else:
+                            self.totalPage = 1
+                    else:
+                        self.totalPage = int(self.totalRecordCount / self.pageRecordCount) + 1
+                    self.addRecords(self.col_list, notes)
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Warning(words=u"请求失败！")
+                    warning.exec_()
 
             def queryRecord(self, limitIndex):
                 """
@@ -268,15 +341,12 @@ class Management(ManagementWindow):
                 try:
                     conn = CR()
                     notes = conn.GetAllNotesRequest(limitIndex, self.pageRecordCount)
-                    """
-                    待完成
-                    分权限显示操作列
-                    添加记录...
-                    coding...
-                    """
+                    self.addRecords(self.col_list, notes['valid'])
+                    conn.CloseChannnel()
                 except Exception as e:
+                    print(e)
                     warning = Warning(words=u"请求失败！")
-                    warning.show()
+                    warning.exec_()
 
         class PreviousNote(Page):
             """
@@ -290,7 +360,7 @@ class Management(ManagementWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = Management(201610414206, 0)
+    win_ = Management(201610414206, 1)
     win_.show()
     # win1 = SysHome()
     # win2 = MyInfo()

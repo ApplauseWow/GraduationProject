@@ -48,10 +48,31 @@ class DBC(object):
         else:
             pass
 
+    # 获取总记录条数
+    def count_record(self, table):
+        """
+        获取总记录的条数
+        :param table: 表名
+        :return: dict{'operation':DBOpertion., 'exception': e, 'result':results | None}
+        """
+
+        sql = "select count(*) from %s" % (table)
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(sql)
+            results = cursor.fetchone()[0]
+            return {'operation': DBOperation.Success, 'exception': None, 'result': results}
+        except Exception as e:
+            return {'operation': DBOperation.Failure, 'exception': e, 'result': None}
+        finally:
+            cursor.close()
+
     # 一般查询操作
     def search_record(self, table, start_end = ()):
         """
         获取表所有信息
+        :param table:　表名
+        :param start_end:　(起始索引号, 一页总条数) | ()
         :return:dict{'operation':DBOpertion., 'exception': e, 'result':results | None}
         """
 
@@ -74,7 +95,7 @@ class DBC(object):
         """
         添加新记录
         :param op: 操作->insert | delete | update
-        :param table: 表
+        :param table: 表名
         :param para_dict: 数据字典
         :return:dict{'operation':DBOpertion., 'exception': e, 'result':None}
         """
@@ -114,9 +135,10 @@ if __name__ == '__main__':
         # d['user_type'] = 1
         # b = db.modify_record('insert', 'user_info', d)
         # print(b)
+        a = db.count_record('user_info')
+        print a['result']
     except Exception as e:
         print(e)
-        db = None
 
 
 

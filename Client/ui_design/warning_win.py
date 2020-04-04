@@ -24,7 +24,7 @@ class Ui_warning_win(object):
         self.words = QtWidgets.QLabel(self.horizontalLayoutWidget)
         font = QtGui.QFont()
         font.setFamily("Century Schoolbook L")
-        font.setPointSize(40)
+        font.setPointSize(30)
         font.setBold(True)
         font.setItalic(True)
         font.setWeight(75)

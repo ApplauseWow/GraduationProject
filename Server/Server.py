@@ -34,6 +34,12 @@ class BackendService(correspondence_pb2_grpc.BackendServicer):
         # func(ip = ip, data = data)
         return correspondence_pb2.HelloResponse(result=pickle.dumps('test'))
 
+    def GetRecordsCount(self, request, context):
+        ip = str(context.peer()).split(':')[1]  # 客户端ip
+        data = pickle.loads(request.para)  # 请求参数
+        res = self.call_method.GetRecordsCount(ip=ip, data=data)
+        return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
+
     def GetAllNotes(self, request, context):
         ip = str(context.peer()).split(':')[1]  # 客户端ip
         data = pickle.loads(request.para)  # 请求参数

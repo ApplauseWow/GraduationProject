@@ -4,4 +4,5 @@ from TypesEnum import *
 
 
 if __name__ == '__main__':
-    print(UserType(int('1')) is UserType.Teacher)
+    a = map(lambda x:x[1], [(1, 2), (1, 2), (1, 2)])
+    print(a)
