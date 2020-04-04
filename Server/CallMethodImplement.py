@@ -23,7 +23,7 @@ class CallMethodImplement(object):
         :return:
         """
         d = dict()
-        d['operation'] = DBOperation.Failure
+        d['operation'] = ClientRequest.Failure
         d['exception'] = Exception('fail to ...')
         return d
 
@@ -38,7 +38,7 @@ class CallMethodImplement(object):
 
         try:
             conn = DBC(client_ip=ip)
-            res = conn.search_record('note_info', (data['start'], data['num']))
+            res = conn.search_record('note_info', (data['start'], data['num']) if data['start'] else ())
             res['operation'] = self._operation_mapper[res['operation']]
             if res['result']: # 如果结果不会空
                 # 过滤数据
@@ -46,7 +46,7 @@ class CallMethodImplement(object):
                 invalid_list = filter(lambda x: NoteStatus(x[4]) == NoteStatus.Invalid, res['result'])  # 过期公告
                 res['result'] = {'valid': valid_list, 'invalid': invalid_list}
             else:
-                pass
+                res['result'] = {'valid': (), 'invalid': ()}
             return res
         except Exception as e:
             return {'operation':ClientRequest.Failure, 'exception':e, 'result': None}

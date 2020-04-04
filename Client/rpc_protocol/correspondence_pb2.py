@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x14\x63orrespondence.proto\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04para\x18\x01 \x01(\x0c\"\x1f\n\rHelloResponse\x12\x0e\n\x06result\x18\x01 \x01(\x0c\"\"\n\rRequestStruct\x12\x11\n\tparameter\x18\x01 \x01(\x0c\" \n\x0eResponseStruct\x12\x0e\n\x06result\x18\x01 \x01(\x0c\x32\xb1\x02\n\x07\x42\x61\x63kend\x12+\n\x08SayHello\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12\x30\n\rSayHelloAgain\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12\x30\n\x0bGetAllNotes\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12/\n\nGetTheNote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12\x30\n\x0bInsertANote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12\x32\n\rModifyTheNote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x14\x63orrespondence.proto\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04para\x18\x01 \x01(\x0c\"\x1f\n\rHelloResponse\x12\x0e\n\x06result\x18\x01 \x01(\x0c\"\x1d\n\rRequestStruct\x12\x0c\n\x04para\x18\x01 \x01(\x0c\" \n\x0eResponseStruct\x12\x0e\n\x06result\x18\x01 \x01(\x0c\x32\xb1\x02\n\x07\x42\x61\x63kend\x12+\n\x08SayHello\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12\x30\n\rSayHelloAgain\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12\x30\n\x0bGetAllNotes\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12/\n\nGetTheNote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12\x30\n\x0bInsertANote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x12\x32\n\rModifyTheNote\x12\x0e.RequestStruct\x1a\x0f.ResponseStruct\"\x00\x62\x06proto3'
 )
 
 
@@ -94,7 +94,7 @@ _REQUESTSTRUCT = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='parameter', full_name='RequestStruct.parameter', index=0,
+      name='para', full_name='RequestStruct.para', index=0,
       number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
@@ -113,7 +113,7 @@ _REQUESTSTRUCT = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=87,
-  serialized_end=121,
+  serialized_end=116,
 )
 
 
@@ -143,8 +143,8 @@ _RESPONSESTRUCT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=123,
-  serialized_end=155,
+  serialized_start=118,
+  serialized_end=150,
 )
 
 DESCRIPTOR.message_types_by_name['HelloRequest'] = _HELLOREQUEST
@@ -189,8 +189,8 @@ _BACKEND = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=158,
-  serialized_end=463,
+  serialized_start=153,
+  serialized_end=458,
   methods=[
   _descriptor.MethodDescriptor(
     name='SayHello',

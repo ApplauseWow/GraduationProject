@@ -255,6 +255,9 @@ class Management(ManagementWindow):
                 Page.__init__(self)
                 self.user_type = user_type
 
+            def initializedModel(self):
+                pass
+
             def queryRecord(self, limitIndex):
                 """
                 重写查询记录
@@ -263,7 +266,8 @@ class Management(ManagementWindow):
                 """
 
                 try:
-                    CR().GetAllNotesRequest(limitIndex, self.pageRecordCount)
+                    conn = CR()
+                    notes = conn.GetAllNotesRequest(limitIndex, self.pageRecordCount)
                     """
                     待完成
                     分权限显示操作列

@@ -20,6 +20,9 @@ class CR(object):
         self.channel = grpc.insecure_channel(self._host)
         self.stub = correspondence_pb2_grpc.BackendStub(self.channel)
 
+    def _CloseChannnel(self):
+        self.channel.close()
+
     def SayHelloRequest(self):
         """
         用于测试
@@ -29,7 +32,7 @@ class CR(object):
         response = self.stub.SayHello(correspondence_pb2.HelloRequest(para=pickle.dumps('test')))
         print(pickle.loads(response.result), type(response.result))
 
-    def GetAllNotesRequest(self, start, num):
+    def GetAllNotesRequest(self, start=None, num=None):
         """
         获取所有公告
         :param start:　起始位置
@@ -40,11 +43,17 @@ class CR(object):
         try:
             data = {'start': start, 'num': num}
             response = self.stub.GetAllNotes(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
-            res = pickle.loads(response)
+            res = pickle.loads(response.result)
             if res['operation'] == ClientRequest.Failure:  # 请求失败
                 return {'valid': (), 'invalid': ()}
             elif res['operation'] == ClientRequest.Success:  # 请求成功
                 return res['result']
-        except Exception:  # 界面捕捉异常并弹出警告窗口
-            raise Exception("fail to send request!")
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+        finally:
+            self._CloseChannnel()
+
+
+
 
