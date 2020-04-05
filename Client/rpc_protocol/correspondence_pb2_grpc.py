@@ -50,6 +50,11 @@ class BackendStub(object):
         request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
         response_deserializer=correspondence__pb2.ResponseStruct.FromString,
         )
+    self.VoidTheNote = channel.unary_unary(
+        '/Backend/VoidTheNote',
+        request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
+        response_deserializer=correspondence__pb2.ResponseStruct.FromString,
+        )
 
 
 class BackendServicer(object):
@@ -107,6 +112,13 @@ class BackendServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def VoidTheNote(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_BackendServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -142,6 +154,11 @@ def add_BackendServicer_to_server(servicer, server):
       ),
       'ModifyTheNote': grpc.unary_unary_rpc_method_handler(
           servicer.ModifyTheNote,
+          request_deserializer=correspondence__pb2.RequestStruct.FromString,
+          response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
+      ),
+      'VoidTheNote': grpc.unary_unary_rpc_method_handler(
+          servicer.VoidTheNote,
           request_deserializer=correspondence__pb2.RequestStruct.FromString,
           response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
       ),

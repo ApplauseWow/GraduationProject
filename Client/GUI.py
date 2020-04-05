@@ -3,6 +3,7 @@ import sys
 from ui_design.ui_finish import *
 from TypesEnum import *
 from ClientRequest import CR
+from TableColumnDict import TABLE_COLUMN_DICT
 
 
 class Page(Pagination):
@@ -23,7 +24,7 @@ class Page(Pagination):
         self.prevButton.clicked.connect(self.onPrevPage)
         self.nextButton.clicked.connect(self.onNextPage)
         self.switchPageButton.clicked.connect(self.onSwitchPage)
-        self.table.clicked.connect(self.showRecord)
+        self.table.doubleClicked.connect(self.showRecord)
 
     def initializedModel(self):
         """
@@ -75,18 +76,18 @@ class Page(Pagination):
         match = pattern.match(szText)
         if not match:
             # QMessageBox.information(self, "提示", "请输入数字.")
-            msg = Warning(words=u"请输入数字")
+            msg = Alert(words=u"请输入数字")
             msg.exec_()
             return
         if szText == "":
             # QMessageBox.information(self, "提示", "请输入跳转页面.")
-            msg = Warning(words=u"请输入跳转页面")
+            msg = Alert(words=u"请输入跳转页面")
             msg.exec_()
             return
         pageIndex = int(szText)
         if pageIndex > self.totalPage or pageIndex < 1:
             # QMessageBox.information(self, "提示", "没有指定的页，清重新输入.")
-            msg = Warning(words=u"没有指定的页，清重新输入")
+            msg = Alert(words=u"没有此页")
             msg.exec_()
             return
 
@@ -128,12 +129,15 @@ class Page(Pagination):
         :return: None
         """
 
-        self.table.clearContents()  # 清空内容
+        # self.table.clearContents()  # 清空内容
+        map(lambda x: self.table.removeRow(x), range(self.table.rowCount()))
         self.table.setColumnCount(len(col_list))
-        self.table.setRowCount(self.pageRecordCount)
+        # 无需设置固定行数，利用insertRow动态添加
+        # self.table.setRowCount(self.pageRecordCount)
         self.table.setHorizontalHeaderLabels(map(lambda x: x['name'], col_list))  # 设置表头
         map(lambda x: self.table.setColumnHidden(x[0], x[1]['is_hidden']), enumerate(col_list))  # 隐藏某些列
         for num_r, row in enumerate(data):
+            self.table.insertRow(num_r)
             pk = []
             self.table.setRowHeight(num_r, 50)
             for num_c, col in enumerate(col_list):
@@ -142,7 +146,7 @@ class Page(Pagination):
                 if col['name'] == u'操作':  # 操作栏
                     self.table.setCellWidget(num_r, num_c, self.addOperationButton(pk))
                 else:  # 普通字段
-                    item = QTableWidgetItem(str(row[num_c]))
+                    item = QTableWidgetItem(u"{}".format(row[num_c]))  # 注意中文编码
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                     self.table.setItem(num_r, num_c, item)
 
@@ -165,7 +169,7 @@ class Page(Pagination):
         :param primary_key:　主键
         :return:
         """
-        
+
         pass
 
 class SysHome(MainWindow):
@@ -191,17 +195,20 @@ class SysHome(MainWindow):
         self.clock.display(time.strftime("%X", time.localtime()))
 
 
-class Warning(WarningWindow):
+class Alert(WarningWindow):
     """
     警告提醒窗
     """
 
-    def __init__(self, words=None):
-        super(Warning, self).__init__()
+    def __init__(self, words=None, _type=None):
+        super(Alert, self).__init__()
         if words:
             self.words.setText(words)
         else:
             pass
+        if _type == 'alright':
+            self.pix = QPixmap('./ui_design/alright.png').scaled(120, 120)
+            self.warning.setPixmap(self.pix)
         # 设置定时器
         self.time_count = QTimer()
         self.time_count.setInterval(1500)
@@ -243,7 +250,10 @@ class Management(ManagementWindow):
     def __init__(self, user_id, user_type):
         super(Management, self).__init__(user_id, user_type)
         # 添加顺序一定按照按钮顺序
-        self.right_layout.addWidget(self.ShowNotes(user_id=user_id, user_type=user_type))  # ！？可能存在切换后切回不是初始状态
+        self.page_one = self.ShowNotes(user_id=user_id, user_type=user_type)
+
+        self.right_layout.addWidget(self.page_one)
+
         self.setUpConnect()
 
     def setUpConnect(self):
@@ -264,10 +274,13 @@ class Management(ManagementWindow):
         try:
             index = self.menu_dict[self.sender().objectName()]
             self.right_layout.setCurrentIndex(index)
-        except:
-            pass
+            self.right_layout.widget(index).initPage()  # 所有组内控件重写一个初始化函数解决了堆叠控件切换后刷新问题
+        except Exception as e:
+            print(e)
+            warning = Alert(words=u"切换失败！")
+            warning.exec_()
 
-    # 以下为内部组件类
+    # 以下为内部组件类 所有init函数参数都必须统一接收user_id user_type 注意顺序
     class ShowNotes(NoteTable):
         """
         继承NoteTable封装业务逻辑
@@ -276,38 +289,61 @@ class Management(ManagementWindow):
     　　　    【学生】一个表格未过期公告表
         """
 
+        __update_previous_note_signal = pyqtSignal()  # 更新过期公告信号
+
         def __init__(self, user_id, user_type):
             NoteTable.__init__(self)
-            if UserType(int(user_type)) == UserType.Teacher:  # 教师
-                self.lay.addWidget(self.CurrentNote(user_type), 2, 0, 5, 5)  # 未过期公告表
-                self.lay.addWidget(self.PreviousNote(), 2, 5, 5, 5)  # 过期公告表
+            self.user_type = user_type
+            self.user_id = user_id
+            if UserType(user_type) == UserType.Teacher:  # 教师
+                self.current_note = self.CurrentNote(user_type, self.__update_previous_note_signal)
+                self.lay.addWidget(self.current_note, 2, 0, 5, 5)  # 未过期公告表
+                self.previous_note = self.PreviousNote(user_type)
+                self.lay.addWidget(self.previous_note, 2, 5, 5, 5)  # 过期公告表
+                self.__update_previous_note_signal.connect(lambda :self.updatePreviousNote(self.previous_note))
                 self.lay.setRowStretch(1, 1)
                 self.lay.setRowStretch(3, 4)
                 self.lay.setRowStretch(7, 1)
-            elif UserType(int(user_type)) == UserType.Student:  # 学生
-                self.lay.addWidget(self.CurrentNote(user_type), 2, 0, 5, 5)
+            elif UserType(user_type) == UserType.Student:  # 学生
+                self.current_note = self.CurrentNote(user_type)
+                self.lay.addWidget(self.current_note, 2, 0, 5, 5)
                 self.bt_insert.hide()
                 self.l_previous_note.hide()
                 self.lay.setRowStretch(1, 1)
                 self.lay.setRowStretch(3, 4)
                 self.lay.setRowStretch(7, 1)
 
+        def initPage(self):
+            """
+            用于切换页面后的初始化页面，仅初始化必要控件
+            :return: None
+            """
+
+            if UserType(self.user_type) == UserType.Teacher:
+                self.previous_note.initializedModel()
+                self.previous_note.updateStatus()
+            self.current_note.initializedModel()
+            self.current_note.updateStatus()
+
+
+        def updatePreviousNote(self, widget):
+            """
+            教师作废公告后刷新过期公告栏
+            :param widget: 控件对象
+            :return: None
+            """
+
+            widget.initializedModel()
+
         class CurrentNote(Page):
             """
             未过期的公告表
             """
 
-            def __init__(self, user_type):
+            def __init__(self, user_type, update_signal=None):
                 Page.__init__(self)
-                self.col_list = [
-                    {'name': 'id', 'is_hidden': True, 'is_pk': True},
-                    {'name': u'标题', 'is_hidden': False, 'is_pk': False},
-                    {'name': u'内容', 'is_hidden': False, 'is_pk': False},
-                    {'name': u'发布日期', 'is_hidden': False, 'is_pk': False},
-                    {'name': 'is_valid', 'is_hidden': True, 'is_pk': False},
-                ]  # 必须按照数据字段顺序
-                if UserType(user_type) == UserType.Teacher:
-                    self.col_list.append({'name': u'操作', 'is_hidden': False, 'is_pk': False})
+                self.update_signal = update_signal
+                self.col_list = TABLE_COLUMN_DICT[UserType(user_type)]['current_note']  # 获取表头信息
                 self.initializedModel()
                 self.setUpConnect()
                 self.updateStatus()
@@ -315,8 +351,8 @@ class Management(ManagementWindow):
             def initializedModel(self):
                 try:
                     conn = CR()
-                    notes = conn.GetAllNotesRequest(0, self.pageRecordCount)['valid']
-                    self.totalRecordCount = len(notes)
+                    self.totalRecordCount = conn.GetCountRequest('note', {'is_valid':NoteStatus.Valid.value})
+                    conn.CloseChannnel()
                     if self.totalRecordCount % self.pageRecordCount == 0:
                         if self.totalRecordCount != 0:
                             self.totalPage = self.totalRecordCount / self.pageRecordCount
@@ -324,11 +360,10 @@ class Management(ManagementWindow):
                             self.totalPage = 1
                     else:
                         self.totalPage = int(self.totalRecordCount / self.pageRecordCount) + 1
-                    self.addRecords(self.col_list, notes)
-                    conn.CloseChannnel()
+                    self.queryRecord(0)
                 except Exception as e:
                     print(e)
-                    warning = Warning(words=u"请求失败！")
+                    warning = Alert(words=u"查询失败！")
                     warning.exec_()
 
             def queryRecord(self, limitIndex):
@@ -345,7 +380,29 @@ class Management(ManagementWindow):
                     conn.CloseChannnel()
                 except Exception as e:
                     print(e)
-                    warning = Warning(words=u"请求失败！")
+                    warning = Alert(words=u"查询失败！")
+                    warning.exec_()
+
+            def operationOnBtClicked(self, primary_key):
+                """
+                重写操作按钮
+                :param primary_key: 主键
+                :return: None
+                """
+
+                try:
+                    conn = CR()
+                    # 更新
+                    res = conn.VoidTheNote(primary_key)
+                    if res == ClientRequest.Success:
+                        alright = Alert(words=u"操作成功！", _type='alright')
+                        alright.exec_()
+                        self.initializedModel()  # 重新刷新页面
+                        self.update_signal.emit()
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"操作失败！")
                     warning.exec_()
 
         class PreviousNote(Page):
@@ -353,8 +410,47 @@ class Management(ManagementWindow):
             过期的公告表
             """
 
-            def __init__(self):
+            def __init__(self, user_type):
                 Page.__init__(self)
+                self.col_list = TABLE_COLUMN_DICT[UserType(user_type)]['previous_note']  # 获取表头信息
+                self.initializedModel()
+                self.setUpConnect()
+                self.updateStatus()
+
+            def initializedModel(self):
+                try:
+                    conn = CR()
+                    self.totalRecordCount = conn.GetCountRequest('note', {'is_valid':NoteStatus.Invalid.value})
+                    conn.CloseChannnel()
+                    if self.totalRecordCount % self.pageRecordCount == 0:
+                        if self.totalRecordCount != 0:
+                            self.totalPage = self.totalRecordCount / self.pageRecordCount
+                        else:
+                            self.totalPage = 1
+                    else:
+                        self.totalPage = int(self.totalRecordCount / self.pageRecordCount) + 1
+                    self.queryRecord(0)
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"查询失败！")
+                    warning.exec_()
+
+            def queryRecord(self, limitIndex):
+                """
+                重写查询记录
+                :param limitIndex:从第limitIndex条开始
+                :return:
+                """
+
+                try:
+                    conn = CR()
+                    notes = conn.GetAllNotesRequest(limitIndex, self.pageRecordCount)
+                    self.addRecords(self.col_list, notes['invalid'])
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"查询失败！")
+                    warning.exec_()
 
 
 

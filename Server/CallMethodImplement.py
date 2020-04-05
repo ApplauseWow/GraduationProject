@@ -7,12 +7,19 @@ from DBC import DBC
 
 class CallMethodImplement(object):
 
-    _operation_mapper = {
+    __operation_mapper = {
         DBOperation.Failure: ClientRequest.Failure,
         ProcessOperation.Failure: ClientRequest.Failure,
         DBOperation.Success: ClientRequest.Success,
         ProcessOperation.Success: ClientRequest.Success
     }
+
+    __obj2table_mapper = {  # 对象映射到表
+        'note': 'note_info',  # 公告
+        'user': 'user_info'  # 用户
+        # ...
+    }
+
 
     @log
     def SayHello(self, ip, data):
@@ -38,8 +45,8 @@ class CallMethodImplement(object):
 
         try:
             conn = DBC(client_ip=ip)
-            res = conn.count_record(data['table'])
-            res['operation'] = self._operation_mapper[res['operation']]
+            res = conn.count_record(self.__obj2table_mapper[data['obj']], data['type'])  # _type中是字典与sql_mapper中名称必须一致
+            res['operation'] = self.__operation_mapper[res['operation']]
             return res
         except Exception as e:
             return {'operation':ClientRequest.Failure, 'exception':e, 'result': None}
@@ -56,7 +63,7 @@ class CallMethodImplement(object):
         try:
             conn = DBC(client_ip=ip)
             res = conn.search_record('note_info', (data['start'], data['num']) if data['start'] else ())
-            res['operation'] = self._operation_mapper[res['operation']]
+            res['operation'] = self.__operation_mapper[res['operation']]
             if res['result']: # 如果结果不会空
                 # 过滤数据
                 valid_list = filter(lambda x: NoteStatus(x[4]) == NoteStatus.Valid, res['result'])  # 未过期公告
@@ -64,6 +71,24 @@ class CallMethodImplement(object):
                 res['result'] = {'valid': valid_list, 'invalid': invalid_list}
             else:
                 res['result'] = {'valid': (), 'invalid': ()}
+            return res
+        except Exception as e:
+            return {'operation':ClientRequest.Failure, 'exception':e, 'result': None}
+
+    @log
+    def VoidTheNote(self, ip, data):
+        """
+        获取所有公告
+        :param ip: 用于识别客户端
+        :param data: 请求参数
+        :return: dict{'operation': , 'exception': , 'result': }
+        """
+
+        try:
+            conn = DBC(client_ip=ip)
+            data['void'] = NoteStatus.Invalid.value
+            res = conn.modify_record('void', 'note_info', data)
+            res['operation'] = self.__operation_mapper[res['operation']]
             return res
         except Exception as e:
             return {'operation':ClientRequest.Failure, 'exception':e, 'result': None}

@@ -18,6 +18,7 @@ service Backend {
     rpc GetTheNote(RequestStruct) returns (ResponseStruct) {} // 教师学生共用，通过id获取
     rpc InsertANote(RequestStruct) returns (ResponseStruct) {} // 教师专用
     rpc ModifyTheNote(RequestStruct) returns (ResponseStruct) {} // 教师专用
+    rpc VoidTheNote(RequestStruct) returns (ResponseStruct) {} // 教师专用
     // ->->
 
 

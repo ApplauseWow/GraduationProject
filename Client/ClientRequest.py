@@ -32,25 +32,28 @@ class CR(object):
         response = self.stub.SayHello(correspondence_pb2.HelloRequest(para=pickle.dumps('test')))
         print(pickle.loads(response.result), type(response.result))
 
-    def GetNotesCountRequest(self, table):
+    # 共用
+    def GetCountRequest(self,obj,  _type=None):
         """
         获取总记录条数
-        :param table: 表名　不应该暴露表名　修改！！！
+        :param obj: 对象 eg: 'note', 'project' 'user' ...
+        :param _type: 是否有分类 eg: NoteStatus.Valid.value | ... 可能是一组{用字典对应}
         :return: 条数
         """
 
         try:
-            data = {'table': table}
+            data = {'obj': obj, 'type': _type}
             response = self.stub.GetRecordsCount(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
             res = pickle.loads(response.result)
             if res['operation'] == ClientRequest.Failure:  # 请求失败
-                return 0
+                raise Exception('fail to get count!')
             elif res['operation'] == ClientRequest.Success:  # 请求成功
                 return res['result']
         except Exception as e:  # 界面捕捉异常并弹出警告窗口
             print(e)
             raise Exception('fail to request!')
 
+    # 公告相关
     def GetAllNotesRequest(self, start=None, num=None):
         """
         获取所有公告
@@ -70,6 +73,26 @@ class CR(object):
         except Exception as e:  # 界面捕捉异常并弹出警告窗口
             print(e)
             raise Exception('fail to request!')
+
+    def VoidTheNote(self, pk):
+        """
+        作废一则公告
+        :param pk:主键　可能是一组　用字典对应
+        :return:res['operation'] 即ClientRequest.Sucess | ...
+        """
+
+        try:
+            data = {'note_id': pk[0]}
+            response = self.stub.VoidTheNote(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:
+                raise Exception('fial to void!')
+            elif res['operation'] == ClientRequest.Success:
+                return ClientRequest.Success
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+
 
 
 if __name__ == '__main__':

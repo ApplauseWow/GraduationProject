@@ -38,6 +38,8 @@
     <table name="note_info">
         <insert>INSERT INTO `note_info` (`title`, `detail`, `pub_date`, `is_valid`) VALUES (%(title)s, %(detail)s, %(pub_date)s, %(is_valid)s);</insert>
         <delete>DELETE FROM `note_info` WHERE `note_id`=%(note_id)s;</delete>
+        <limited_count>SELECT COUNT(*) FROM `note_info` WHERE `is_valid`=%(is_valid)s</limited_count>
+        <void>UPDATE `note_info` SET `is_valid`=%(void)s WHERE `note_id`=%(note_id)s;</void>>
     </table>
     <table name="project_info">
         <insert>INSERT INTO `project_info` (`pj_name`, `description`, `pj_start_time`, `is_done`) VALUES (%(pj_name)s, %(description)s, %(pj_start_time)s, %(is_done)s);</insert>

@@ -48,18 +48,28 @@ class DBC(object):
         else:
             pass
 
-    # 获取总记录条数
-    def count_record(self, table):
+    # 一般获取总记录条数
+    def count_record(self, table, _type):
         """
         获取总记录的条数
         :param table: 表名
+        :param _type: 限制要求　一个字典
         :return: dict{'operation':DBOpertion., 'exception': e, 'result':results | None}
         """
 
-        sql = "select count(*) from %s" % (table)
+        if _type:  # 有筛选要求，仅针对
+            tree = ET.parse(self.sql_mapper)
+            root = tree.getroot()
+            res = filter(lambda x: x.get('name') == table, root.findall('table'))  # 找到table的sql
+            sql = res[0].find('limited_count').text
+        else:  # 没有要求
+            sql = "select count(*) from %s" % (table)
         cursor = self.conn.cursor()
         try:
-            cursor.execute(sql)
+            if _type:
+                cursor.execute(sql, _type)
+            else:
+                cursor.execute(sql)
             results = cursor.fetchone()[0]
             return {'operation': DBOperation.Success, 'exception': None, 'result': results}
         except Exception as e:
@@ -111,7 +121,7 @@ class DBC(object):
                 self.conn.commit()  # 必须提交事务才能生效
                 return {'operation': DBOperation.Success, 'exception': None, 'result': None}
             else:  # 操作失败
-                return {'operation': DBOperation.Failure, 'exception': Exception("fail to {}",format(op)), 'result': None}
+                return {'operation': DBOperation.Failure, 'exception': Exception("fail to {}".format(op)), 'result': None}
         except Exception as e:  # 操作失败
             return {'operation': DBOperation.Failure, 'exception': e, 'result': None}
         finally:
@@ -135,8 +145,12 @@ if __name__ == '__main__':
         # d['user_type'] = 1
         # b = db.modify_record('insert', 'user_info', d)
         # print(b)
-        a = db.count_record('user_info')
-        print a['result']
+        # from datetime import date
+        # a = db.modify_record('insert', 'note_info', {'title':"第二", 'detail': "通知", 'pub_date':date(2020, 10, 1), 'is_valid':1})
+        # res = db.search_record('note_info')['result']
+        # print(res[2][1], type(res[2][1]), res[2][1], type(res[2][1]))
+        # print(u"{}".format(res[2][4]))
+        print db.count_record('note_info', {'is_valid': 1})['result']
     except Exception as e:
         print(e)
 

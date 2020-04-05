@@ -4,5 +4,20 @@ from TypesEnum import *
 
 
 if __name__ == '__main__':
-    a = map(lambda x:x[1], [(1, 2), (1, 2), (1, 2)])
-    print(a)
+
+    class Out:
+        def __init__(self):
+            self.i = self.Inner()
+            print(id(self.i), id(self.Inner()))
+
+        class Inner:
+            def __init__(self):
+                self.i()
+
+            def i(self):
+                print("inner finc")
+
+    o = Out()
+    print(id(o))
+    o.__init__()
+    print(id(o))
