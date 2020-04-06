@@ -364,7 +364,7 @@ class NoteTable(QWidget):
 class NoteDetail(QDialog):
     """
     点击公告表后弹出公告详情窗口(所有用户)/添加新公告窗口(教师)
-    教师权限：增查改 | 学生权限：查
+    教师权限：增(查改) | 学生权限：查
     """
 
     def __init__(self):

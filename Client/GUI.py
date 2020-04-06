@@ -4,6 +4,7 @@ from ui_design.ui_finish import *
 from TypesEnum import *
 from ClientRequest import CR
 from TableColumnDict import TABLE_COLUMN_DICT
+from ColumnMapper import Index2ColName
 
 
 class Page(Pagination):
@@ -90,7 +91,9 @@ class Page(Pagination):
             msg = Alert(words=u"没有此页")
             msg.exec_()
             return
-
+        if pageIndex == self.currentPage:  # 就是当前页面
+            # 直接返回，避免不必要的查询开销
+            return
         limitIndex = (pageIndex - 1) * self.pageRecordCount
         self.queryRecord(limitIndex)
         self.currentPage = pageIndex
@@ -114,7 +117,7 @@ class Page(Pagination):
         else:
             self.nextButton.setEnabled(True)
 
-    def showRecord(self):
+    def showRecord(self, index):
         """
         双击表格显示具体记录信息，待重写
         :return:
@@ -408,6 +411,24 @@ class Management(ManagementWindow):
                     warning = Alert(words=u"操作失败！")
                     warning.exec_()
 
+            def showRecord(self, index):
+                """
+                重写双击记录信号的槽函数
+                :param index: index.row(), index.column()
+                :return:None
+                """
+
+                row = index.row()
+                col = self.table.columnCount()
+                data = {}
+                for c in range(col):
+                    item = self.table.item(row, c)
+                    if isinstance(item, QTableWidgetItem):  # 是数据
+                        data[Index2ColName['note'][c]] = item.text()
+                    else:  # 不是数据
+                        pass
+                # 弹窗查看
+
         class PreviousNote(Page):
             """
             过期的公告表
@@ -460,7 +481,7 @@ class Management(ManagementWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = Management(201610414206, 1)
+    win_ = Management(201610414206, 0)
     win_.show()
     # win1 = SysHome()
     # win2 = MyInfo()
