@@ -78,7 +78,7 @@ class DBC(object):
             cursor.close()
 
     # 一般查询操作
-    def search_record(self, table, start_end = ()):
+    def search_record(self, table, start_end=(), limitation=None):
         """
         获取表所有信息
         :param table:　表名
@@ -86,13 +86,31 @@ class DBC(object):
         :return:dict{'operation':DBOpertion., 'exception': e, 'result':results | None}
         """
 
-        if start_end is ():  # 不需要分页
+        if start_end == () and not limitation:  # 不需要分页, 也没有限制
             sql = "select * from %s;" % table
-        else:  # 需要分页
+        elif start_end != () and not limitation:  # 需要分页，但没有限制
             sql = "select * from %s limit %s, %s;" % (table, start_end[0], start_end[1])
+        elif start_end != () and limitation: # 需要分页且有限制条件
+            tree = ET.parse(self.sql_mapper)
+            root = tree.getroot()
+            res = filter(lambda x: x.get('name') == table, root.findall('table'))  # 找到table的sql
+            sql = res[0].find('limited_search').text
+            limitation['start'] = start_end[0]
+            limitation['num'] = start_end[1]
+        elif start_end ==() and limitation:  # 不需要分页，但忧限制要求
+            tree = ET.parse(self.sql_mapper)
+            root = tree.getroot()
+            res = filter(lambda x: x.get('name') == table, root.findall('table'))  # 找到table的sql
+            basic_sql = res[0].find('limited_search').text
+            sql = basic_sql[:basic_sql.find('limit')] + ';'
+        else:  # 仅仅为代码完整，以上已经枚举所有情况
+            sql = ""
         cursor = self.conn.cursor()
         try:
-            cursor.execute(sql)
+            if not limitation:
+                cursor.execute(sql)
+            elif limitation:
+                cursor.execute(sql, limitation)
             results = cursor.fetchall()
             return {'operation': DBOperation.Success, 'exception': None, 'result': results}
         except Exception as e:
@@ -130,7 +148,7 @@ class DBC(object):
 
 if __name__ == '__main__':
     try:
-        db = DBC('192.168.2.104')
+        db = DBC('127.0.0.1')
         # a = db.get_all_info("user_info", (0, 3))
         # print len(a)
         # print(a == ())
@@ -150,7 +168,12 @@ if __name__ == '__main__':
         # res = db.search_record('note_info')['result']
         # print(res[2][1], type(res[2][1]), res[2][1], type(res[2][1]))
         # print(u"{}".format(res[2][4]))
-        print db.count_record('note_info', {'is_valid': 1})['result']
+        # print db.count_record('note_info', {'is_valid': 1})['result']
+        # a = "SELECT * FROM `note_info` WHERE `is_valid`=%(is_valid)s limit %(start)s, %(num)s;"
+        # index = a.find('limit')
+        # s = a[:index]+';'
+        # print(s)
+        print db.search_record('note_info', (0, 8), {'is_valid':0})['result']
     except Exception as e:
         print(e)
 

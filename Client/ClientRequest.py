@@ -14,10 +14,11 @@ class CR(object):
     客户端请求连接
     """
 
-    _host = '192.168.2.104:44967'
+    _HOST = 'localhost'
+    _PORT = '44967'
 
     def __init__(self):
-        self.channel = grpc.insecure_channel(self._host)
+        self.channel = grpc.insecure_channel("{server}:{port}".format(server=self._HOST, port=self._PORT))
         self.stub = correspondence_pb2_grpc.BackendStub(self.channel)
 
     def CloseChannnel(self):
@@ -54,20 +55,21 @@ class CR(object):
             raise Exception('fail to request!')
 
     # 公告相关
-    def GetAllNotesRequest(self, start=None, num=None):
+    def GetAllNotesRequest(self, start=None, num=None, is_valid=None):
         """
         获取所有公告
-        :param start:　起始位置
-        :param num:　每页条数
+        :param start:　限制田间，起始位置
+        :param num:　限制条件，每页条数
+        :param is_valid: 限制条件，公告过期|未过期
         :return:{'valid':, 'invalid:'}
         """
 
         try:
-            data = {'start': start, 'num': num}
+            data = {'obj': 'note', 'start': start, 'num': num, 'is_valid': is_valid}
             response = self.stub.GetAllNotes(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
             res = pickle.loads(response.result)
             if res['operation'] == ClientRequest.Failure:  # 请求失败
-                return {'valid': (), 'invalid': ()}
+                return ()
             elif res['operation'] == ClientRequest.Success:  # 请求成功
                 return res['result']
         except Exception as e:  # 界面捕捉异常并弹出警告窗口

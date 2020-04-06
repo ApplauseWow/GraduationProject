@@ -686,7 +686,7 @@ class Pagination(QWidget):
         # 总记录数
         self.totalRecordCount = 0
         # 每页记录数
-        self.pageRecordCount = 8
+        self.pageRecordCount = 11
 
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -695,6 +695,7 @@ class Pagination(QWidget):
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.horizontalHeader().setFixedHeight(35)
         self.table.verticalHeader().setVisible(False)
+        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.layout.addWidget(self.table)
 
         hLayout = QHBoxLayout()

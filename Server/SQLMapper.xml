@@ -40,6 +40,7 @@
         <delete>DELETE FROM `note_info` WHERE `note_id`=%(note_id)s;</delete>
         <limited_count>SELECT COUNT(*) FROM `note_info` WHERE `is_valid`=%(is_valid)s</limited_count>
         <void>UPDATE `note_info` SET `is_valid`=%(void)s WHERE `note_id`=%(note_id)s;</void>>
+        <limited_search>SELECT * FROM `note_info` WHERE `is_valid`=%(is_valid)s limit %(start)s, %(num)s;</limited_search>
     </table>
     <table name="project_info">
         <insert>INSERT INTO `project_info` (`pj_name`, `description`, `pj_start_time`, `is_done`) VALUES (%(pj_name)s, %(description)s, %(pj_start_time)s, %(is_done)s);</insert>

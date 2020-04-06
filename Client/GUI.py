@@ -130,7 +130,8 @@ class Page(Pagination):
         """
 
         # self.table.clearContents()  # 清空内容
-        map(lambda x: self.table.removeRow(x), range(self.table.rowCount()))
+        # 非常奇怪表格行不能顺序删除不然会莫名其妙的错误，必须逆序删除，so interesting～～!?!?
+        map(lambda x: self.table.removeRow(x), range(self.table.rowCount())[::-1])
         self.table.setColumnCount(len(col_list))
         # 无需设置固定行数，利用insertRow动态添加
         # self.table.setRowCount(self.pageRecordCount)
@@ -211,7 +212,7 @@ class Alert(WarningWindow):
             self.warning.setPixmap(self.pix)
         # 设置定时器
         self.time_count = QTimer()
-        self.time_count.setInterval(1500)
+        self.time_count.setInterval(800)
         self.time_count.start()
         self.time_count.timeout.connect(self.timeout_close)
 
@@ -325,7 +326,6 @@ class Management(ManagementWindow):
             self.current_note.initializedModel()
             self.current_note.updateStatus()
 
-
         def updatePreviousNote(self, widget):
             """
             教师作废公告后刷新过期公告栏
@@ -334,6 +334,7 @@ class Management(ManagementWindow):
             """
 
             widget.initializedModel()
+            widget.updateStatus()
 
         class CurrentNote(Page):
             """
@@ -351,6 +352,7 @@ class Management(ManagementWindow):
             def initializedModel(self):
                 try:
                     conn = CR()
+                    self.currentPage = 1
                     self.totalRecordCount = conn.GetCountRequest('note', {'is_valid':NoteStatus.Valid.value})
                     conn.CloseChannnel()
                     if self.totalRecordCount % self.pageRecordCount == 0:
@@ -375,8 +377,8 @@ class Management(ManagementWindow):
 
                 try:
                     conn = CR()
-                    notes = conn.GetAllNotesRequest(limitIndex, self.pageRecordCount)
-                    self.addRecords(self.col_list, notes['valid'])
+                    notes = conn.GetAllNotesRequest(start=limitIndex, num=self.pageRecordCount, is_valid=NoteStatus.Valid.value)
+                    self.addRecords(self.col_list, notes)
                     conn.CloseChannnel()
                 except Exception as e:
                     print(e)
@@ -397,7 +399,8 @@ class Management(ManagementWindow):
                     if res == ClientRequest.Success:
                         alright = Alert(words=u"操作成功！", _type='alright')
                         alright.exec_()
-                        self.initializedModel()  # 重新刷新页面
+                        self.initializedModel()  # 重新刷新页面色
+                        self.updateStatus()
                         self.update_signal.emit()
                     conn.CloseChannnel()
                 except Exception as e:
@@ -420,6 +423,7 @@ class Management(ManagementWindow):
             def initializedModel(self):
                 try:
                     conn = CR()
+                    self.currentPage = 1
                     self.totalRecordCount = conn.GetCountRequest('note', {'is_valid':NoteStatus.Invalid.value})
                     conn.CloseChannnel()
                     if self.totalRecordCount % self.pageRecordCount == 0:
@@ -444,8 +448,8 @@ class Management(ManagementWindow):
 
                 try:
                     conn = CR()
-                    notes = conn.GetAllNotesRequest(limitIndex, self.pageRecordCount)
-                    self.addRecords(self.col_list, notes['invalid'])
+                    notes = conn.GetAllNotesRequest(start=limitIndex, num=self.pageRecordCount, is_valid=NoteStatus.Invalid.value)
+                    self.addRecords(self.col_list, notes)
                     conn.CloseChannnel()
                 except Exception as e:
                     print(e)

@@ -10,7 +10,8 @@ except:
     import pickle
 
 _MAX_WORKER = 10
-_PERMIT_CLIENTS_AND_PORT = '[::]:44967'
+_PERMIT_CLIENTS = 'localhost'
+_PORT = '44967'
 _ONE_DAY_IN_SECONDS = 60*60*24
 
 
@@ -43,7 +44,7 @@ class BackendService(correspondence_pb2_grpc.BackendServicer):
     def GetAllNotes(self, request, context):
         ip = str(context.peer()).split(':')[1]  # 客户端ip
         data = pickle.loads(request.para)  # 请求参数
-        res = self.call_method.GetAllNotes(ip=ip, data=data)
+        res = self.call_method.GetAllObjects(ip=ip, data=data)
         return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
 
 
@@ -66,7 +67,7 @@ class BackendService(correspondence_pb2_grpc.BackendServicer):
 def service():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=_MAX_WORKER))
     correspondence_pb2_grpc.add_BackendServicer_to_server(BackendService(), server)
-    server.add_insecure_port(_PERMIT_CLIENTS_AND_PORT)
+    server.add_insecure_port("{client}:{port}".format(client=_PERMIT_CLIENTS, port=_PORT))
     server.start()
     # 一直阻塞保持服务状态，当ctrl+C时停止服务
     try:
