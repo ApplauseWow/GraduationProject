@@ -10,7 +10,7 @@ except:
     import pickle
 
 _MAX_WORKER = 10
-_PERMIT_CLIENTS = 'localhost'
+_PERMIT_CLIENTS = 'localhost'  # '[::]'
 _PORT = '44967'
 _ONE_DAY_IN_SECONDS = 60*60*24
 
@@ -52,10 +52,16 @@ class BackendService(correspondence_pb2_grpc.BackendServicer):
         pass
 
     def InsertANote(self, request, context):
-        pass
+        ip = str(context.peer()).split(':')[1]  # 客户端ip
+        data = pickle.loads(request.para)  # 请求参数
+        res = self.call_method.InsertANote(ip=ip, data=data)
+        return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
 
     def ModifyTheNote(self, request, context):
-        pass
+        ip = str(context.peer()).split(':')[1]  # 客户端ip
+        data = pickle.loads(request.para)  # 请求参数
+        res = self.call_method.ModifyTheNote(ip=ip, data=data)
+        return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
 
     def VoidTheNote(self, request, context):
         ip = str(context.peer()).split(':')[1]  # 客户端ip

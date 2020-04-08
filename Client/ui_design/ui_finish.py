@@ -2,7 +2,7 @@
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QDialog, QLabel, QLCDNumber, QGridLayout, QPushButton, \
     QLineEdit, QVBoxLayout, QHBoxLayout, QHeaderView, QMessageBox, QTableWidget, QAbstractItemView, QTableWidgetItem, \
-    QFrame, QStackedLayout
+    QFrame, QStackedLayout, QTextEdit
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QEvent
 import time
 import re
@@ -11,6 +11,7 @@ from main_win import Ui_MainWindow
 from id_info_win import Ui_id_info_win
 from warning_win import Ui_warning_win
 from register_win import Ui_register_win
+from note_detail import Ui_Note_Detail_Win
 
 
 class DIYLabel(QLabel):
@@ -358,6 +359,24 @@ class NoteTable(QWidget):
                 color:white;
                 font: bold 18px;
             }
+            
+            QPushButton#bt_insert:hover{
+                background-color:white;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:orange;
+                font: bold 18px;
+            }
+            
+            QPushButton#bt_insert:pressed{
+                background-color:white;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:orange;
+                font: bold 18px;
+            }
         ''')
 
 
@@ -369,6 +388,100 @@ class NoteDetail(QDialog):
 
     def __init__(self):
         QDialog.__init__(self)
+        self.note_layout = QGridLayout()
+        self.l_title = QLabel()
+        self.l_title.setText(u"标题:")
+        self.l_date = QLabel()
+        self.l_date.setText(u"发布日期:")
+        self.l_detail = QLabel()
+        self.l_detail.setText(u"公告内容:")
+        self.d_id = QLabel()
+        self.d_is_valid = QLabel()
+        self.d_title = QLineEdit()
+        self.d_date = QLabel()
+        self.d_detail = QTextEdit()
+        self.bt_close = QPushButton(u"关闭")
+        self.bt_update = QPushButton(u"修改")
+        self.bt_insert = QPushButton(u"添加")
+
+        self.note_layout.addWidget(self.l_title, 0, 0, 1, 1)
+        self.note_layout.addWidget(self.d_title, 0, 1, 1, 3)
+        self.note_layout.addWidget(self.l_date, 1, 0, 1, 1)
+        self.note_layout.addWidget(self.d_date, 1, 1, 1, 3)
+        self.note_layout.addWidget(self.l_detail, 2, 0, 1, 1)
+        self.note_layout.addWidget(self.d_detail, 3, 0, 3, 4)
+        self.note_layout.addWidget(self.bt_close, 6, 3, 1, 1)
+        self.note_layout.addWidget(self.bt_insert, 6, 2, 1, 1)
+        self.note_layout.addWidget(self.bt_update, 6, 1, 1, 1)
+        self.note_layout.addWidget(self.d_id, 7, 0, 1, 1)
+        self.note_layout.addWidget(self.d_is_valid, 7, 1, 1, 1)
+
+        self.setLayout(self.note_layout)
+        self.setUpCSS()
+
+    def setUpCSS(self):
+        self.setStyleSheet('''
+            QLabel{
+                background-color:rgba(255,165,0,200);
+                border-style:outset;
+                border-width:4px;
+                border-radius:10px;
+                border-color:rgba(255,255,255,30);
+                font:bold 15px;
+                color:rgb(255,255,255);
+                padding:6px;
+                text-align: center;
+            }
+            
+            QPushButton{
+                background-color:orange;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:white;
+                font: bold 18px;
+            }
+            
+            QPushButton:hover{
+                background-color:white;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:orange;
+                font: bold 18px;
+            }
+            
+            QPushButton:pressed{
+                background-color:white;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:orange;
+                font: bold 18px;
+            }
+            
+            QLineEdit{
+                background-color:rgba(255,165,0,200);
+                font: bold 15px;
+                height:30px;
+                border-radius:5px;
+                color:white;
+            }
+            
+            QTextEdit{
+                background-color:rgba(255,165,0,200);
+                font: bold 18px;
+                height:30px;
+                border-radius:5px;
+                color:white;
+            }
+        ''')
+        self.d_is_valid.hide()
+        self.d_id.hide()
+
+        self.resize(400, 300)
+        self.setAttribute(Qt.WA_TranslucentBackground)  # 窗体背景透明
+        self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口
 
 
 class StuffTable(QWidget):
@@ -792,4 +905,10 @@ class OperationButtonInTable(QPushButton):
         '''%({'color':color}))
 
 
-
+if __name__ == '__main__':
+    import numpy as np
+    a = np.array([x for x in range(100)])
+    a = [str(x) for x in a]
+    print(a)
+    b = ",".join(a)
+    print(b)

@@ -5,6 +5,8 @@ from TypesEnum import *
 from ClientRequest import CR
 from TableColumnDict import TABLE_COLUMN_DICT
 from ColumnMapper import Index2ColName
+import time
+import datetime
 
 
 class Page(Pagination):
@@ -293,21 +295,20 @@ class Management(ManagementWindow):
     　　　    【学生】一个表格未过期公告表
         """
 
-        __update_previous_note_signal = pyqtSignal()  # 更新过期公告信号
-
         def __init__(self, user_id, user_type):
             NoteTable.__init__(self)
             self.user_type = user_type
             self.user_id = user_id
             if UserType(user_type) == UserType.Teacher:  # 教师
-                self.current_note = self.CurrentNote(user_type, self.__update_previous_note_signal)
+                self.current_note = self.CurrentNote(user_type)
                 self.lay.addWidget(self.current_note, 2, 0, 5, 5)  # 未过期公告表
                 self.previous_note = self.PreviousNote(user_type)
                 self.lay.addWidget(self.previous_note, 2, 5, 5, 5)  # 过期公告表
-                self.__update_previous_note_signal.connect(lambda :self.updatePreviousNote(self.previous_note))
+                self.current_note.update_signal.connect(self.initPage)
                 self.lay.setRowStretch(1, 1)
                 self.lay.setRowStretch(3, 4)
                 self.lay.setRowStretch(7, 1)
+                self.bt_insert.clicked.connect(lambda :self.createANoteDetail(user_type, None))
             elif UserType(user_type) == UserType.Student:  # 学生
                 self.current_note = self.CurrentNote(user_type)
                 self.lay.addWidget(self.current_note, 2, 0, 5, 5)
@@ -329,6 +330,16 @@ class Management(ManagementWindow):
             self.current_note.initializedModel()
             self.current_note.updateStatus()
 
+        def createANoteDetail(self, user_type, data):
+            """
+            创建一个公告详情
+            :return: None
+            """
+
+            win = self.ANote(user_type, data)
+            win.update_signal.connect(self.initPage)
+            win.exec_()
+
         def updatePreviousNote(self, widget):
             """
             教师作废公告后刷新过期公告栏
@@ -344,9 +355,11 @@ class Management(ManagementWindow):
             未过期的公告表
             """
 
-            def __init__(self, user_type, update_signal=None):
+            update_signal = pyqtSignal()  # 更新过期公告信号
+
+            def __init__(self, user_type):
                 Page.__init__(self)
-                self.update_signal = update_signal
+                self.user_type = user_type
                 self.col_list = TABLE_COLUMN_DICT[UserType(user_type)]['current_note']  # 获取表头信息
                 self.initializedModel()
                 self.setUpConnect()
@@ -428,6 +441,9 @@ class Management(ManagementWindow):
                     else:  # 不是数据
                         pass
                 # 弹窗查看
+                note_detail = Management.ShowNotes.ANote(self.user_type, data)
+                note_detail.update_signal.connect(lambda :self.update_signal.emit())
+                note_detail.exec_()
 
         class PreviousNote(Page):
             """
@@ -436,6 +452,7 @@ class Management(ManagementWindow):
 
             def __init__(self, user_type):
                 Page.__init__(self)
+                self.user_type = user_type
                 self.col_list = TABLE_COLUMN_DICT[UserType(user_type)]['previous_note']  # 获取表头信息
                 self.initializedModel()
                 self.setUpConnect()
@@ -477,11 +494,122 @@ class Management(ManagementWindow):
                     warning = Alert(words=u"查询失败！")
                     warning.exec_()
 
+            def showRecord(self, index):
+                """
+                重写双击记录信号的槽函数
+                :param index: index.row(), index.column()
+                :return:None
+                """
 
+                row = index.row()
+                col = self.table.columnCount()
+                data = {}
+                for c in range(col):
+                    item = self.table.item(row, c)
+                    if isinstance(item, QTableWidgetItem):  # 是数据
+                        data[Index2ColName['note'][c]] = item.text()
+                    else:  # 不是数据
+                        pass
+                # 弹窗查看
+                note_detail = Management.ShowNotes.ANote(self.user_type, data)
+                note_detail.update_signal.connect(lambda :self.update_signal.emit())
+                note_detail.bt_insert.hide()
+                note_detail.bt_update.hide()
+                note_detail.d_title.setEnabled(False)
+                note_detail.d_detail.setEnabled(False)
+                note_detail.exec_()
+
+        class ANote(NoteDetail):
+            """
+            公告详情 | 添加/修改公告　窗口
+            """
+
+            update_signal = pyqtSignal()  # 更新未过期公告栏信号
+
+            def __init__(self, user_type, data=None):
+                NoteDetail.__init__(self)
+                if UserType(user_type) == UserType.Student:  # 学生
+                    self.bt_update.hide()
+                    self.bt_insert.hide()
+                    self.d_title.setEnabled(False)
+                    self.d_detail.setEnabled(False)
+                else:  # 教师
+                    pass
+                if not data:  # 插入
+                    self.l_date.hide()
+                    self.d_date.hide()
+                    self.bt_update.hide()
+                else:  # 查看或者修改
+                    self.bt_insert.hide()
+                    self.d_title.setText(data['title'])
+                    self.d_date.setText(data['pub_date'])
+                    self.d_detail.setText(data['detail'])
+                    self.d_id.setText(data['note_id'])
+                    self.d_is_valid.setText(data['is_valid'])
+
+                self.bt_insert.clicked.connect(self.CreateNewNote)
+                self.bt_update.clicked.connect(self.ModifyNote)
+                self.bt_close.clicked.connect(self.close)
+
+            def CreateNewNote(self):
+                """
+                创建新公告
+                :return: None
+                """
+
+                t = time.localtime(time.time())
+                data = {
+                    'title': self.d_title.text(),
+                    'detail': self.d_detail.toPlainText(),
+                    'pub_date': datetime.date(*(t.tm_year, t.tm_mon, t.tm_mday)),
+                    'is_valid': NoteStatus.Valid.value
+                }
+                try:
+                    conn = CR()
+                    res = conn.InsertANoteRequest(data)
+                    if res == ClientRequest.Success:
+                        alright = Alert(words=u"操作成功！", _type='alright')
+                        alright.exec_()
+                        self.update_signal.emit()
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"操作失败！")
+                    warning.exec_()
+                finally:
+                    self.close()
+
+            def ModifyNote(self):
+                """
+                修改公告
+                :return:None
+                """
+
+                t = time.localtime(time.time())
+                data = {
+                    'title': self.d_title.text(),
+                    'detail': self.d_detail.toPlainText(),
+                    'pub_date': datetime.date(*(t.tm_year, t.tm_mon, t.tm_mday)),
+                    'note_id': int(self.d_id.text())
+                }
+                try:
+                    conn = CR()
+                    res = conn.ModifyTheNoteRequest(data)
+                    if res == ClientRequest.Success:
+                        alright = Alert(words=u"操作成功！", _type='alright')
+                        alright.exec_()
+                        self.update_signal.emit()
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"操作失败！")
+                    warning.exec_()
+                finally:
+                    self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = Management(201610414206, 0)
+    win_ = Management(201610414206, 1)
     win_.show()
     # win1 = SysHome()
     # win2 = MyInfo()

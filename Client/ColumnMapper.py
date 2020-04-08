@@ -4,7 +4,7 @@
 Index2ColName = {  # 按照表(对象)分类
     
     'note': {
-        0:'id', 1:'title', 2:'detail', 3:'pub_date', 4:'is_valid'
+        0:'note_id', 1:'title', 2:'detail', 3:'pub_date', 4:'is_valid'
     },
 
     'user': {

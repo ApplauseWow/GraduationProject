@@ -14,7 +14,7 @@ class CR(object):
     客户端请求连接
     """
 
-    _HOST = 'localhost'
+    _HOST = 'localhost'  # 192.168.
     _PORT = '44967'
 
     def __init__(self):
@@ -95,7 +95,41 @@ class CR(object):
             print(e)
             raise Exception('fail to request!')
 
+    def InsertANoteRequest(self, data):
+        """
+        添加一则新公告
+        :param data:数据
+        :return: res['operation'] 即ClientRequest.Sucess | ...
+        """
 
+        try:
+            response = self.stub.InsertANote(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:
+                raise Exception('fial to insert!')
+            elif res['operation'] == ClientRequest.Success:
+                return ClientRequest.Success
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+
+    def ModifyTheNoteRequest(self, data):
+        """
+        添加一则新公告
+        :param data:数据
+        :return: res['operation'] 即ClientRequest.Sucess | ...
+        """
+
+        try:
+            response = self.stub.ModifyTheNote(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:
+                raise Exception('fial to insert!')
+            elif res['operation'] == ClientRequest.Success:
+                return ClientRequest.Success
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
 
 if __name__ == '__main__':
     conn = CR()

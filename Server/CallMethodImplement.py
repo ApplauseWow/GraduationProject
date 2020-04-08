@@ -73,7 +73,7 @@ class CallMethodImplement(object):
     @log
     def VoidTheNote(self, ip, data):
         """
-        获取所有公告
+        作废一则公告
         :param ip: 用于识别客户端
         :param data: 请求参数
         :return: dict{'operation': , 'exception': , 'result': }
@@ -88,3 +88,36 @@ class CallMethodImplement(object):
         except Exception as e:
             return {'operation':ClientRequest.Failure, 'exception':e, 'result': None}
 
+    @log
+    def InsertANote(self ,ip, data):
+        """
+        添加一则新公告
+        :param ip: 用于识别客户端
+        :param data: 请求参数
+        :return: dict{'operation': , 'exception': , 'result': }
+        """
+
+        try:
+            conn = DBC(client_ip=ip)
+            res = conn.modify_record('insert', 'note_info', data)
+            res['operation'] = self.__operation_mapper[res['operation']]
+            return res
+        except Exception as e:
+            return {'operation': ClientRequest.Failure, 'exception': e, 'result': None}
+
+    @log
+    def ModifyTheNote(self, ip, data):
+        """
+        修改公告
+        :param ip: 用于识别客户端
+        :param data: 请求参数
+        :return: dict{'operation': , 'exception': , 'result': }
+        """
+
+        try:
+            conn = DBC(client_ip=ip)
+            res = conn.modify_record('update', 'note_info', data)
+            res['operation'] = self.__operation_mapper[res['operation']]
+            return res
+        except Exception as e:
+            return {'operation': ClientRequest.Failure, 'exception': e, 'result': None}
