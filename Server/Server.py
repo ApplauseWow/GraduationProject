@@ -47,26 +47,51 @@ class BackendService(correspondence_pb2_grpc.BackendServicer):
         res = self.call_method.GetAllObjects(ip=ip, data=data)
         return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
 
-
-    def GetTheNote(self, request, context):
-        pass
-
     def InsertANote(self, request, context):
         ip = str(context.peer()).split(':')[1]  # 客户端ip
         data = pickle.loads(request.para)  # 请求参数
-        res = self.call_method.InsertANote(ip=ip, data=data)
+        data['obj'] = 'note'
+        res = self.call_method.InsertAObject(ip=ip, data=data)
         return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
 
     def ModifyTheNote(self, request, context):
         ip = str(context.peer()).split(':')[1]  # 客户端ip
         data = pickle.loads(request.para)  # 请求参数
-        res = self.call_method.ModifyTheNote(ip=ip, data=data)
+        data['obj'] = 'note'
+        res = self.call_method.ModifyTheObject(ip=ip, data=data)
         return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
 
     def VoidTheNote(self, request, context):
         ip = str(context.peer()).split(':')[1]  # 客户端ip
         data = pickle.loads(request.para)  # 请求参数
         res = self.call_method.VoidTheNote(ip=ip, data=data)
+        return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
+
+    def GetAllUsers(self, request, context):
+        ip = str(context.peer()).split(':')[1]  # 客户端ip
+        data = pickle.loads(request.para)  # 请求参数
+        res = self.call_method.GetAllObjects(ip=ip, data=data)
+        return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
+
+    def InsertAUser(self, request, context):
+        ip = str(context.peer()).split(':')[1]  # 客户端ip
+        data = pickle.loads(request.para)  # 请求参数
+        data['obj'] = 'user'
+        res = self.call_method.InsertAObject(ip=ip, data=data)
+        return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
+
+    def ModifyTheUser(self, request, context):
+        ip = str(context.peer()).split(':')[1]  # 客户端ip
+        data = pickle.loads(request.para)  # 请求参数
+        data['obj'] = 'user'
+        res = self.call_method.ModifyTheObject(ip=ip, data=data)
+        return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
+
+    def DeleteTheUser(self, request, context):
+        ip = str(context.peer()).split(':')[1]  # 客户端ip
+        data = pickle.loads(request.para)  # 请求参数
+        data['obj'] = 'user'
+        res = self.call_method.DeleteTheObject(ip=ip, data=data)
         return correspondence_pb2.ResponseStruct(result=pickle.dumps(res))
 
 

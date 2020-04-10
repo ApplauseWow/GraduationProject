@@ -61,7 +61,7 @@ class CR(object):
         :param start:　限制田间，起始位置
         :param num:　限制条件，每页条数
         :param is_valid: 限制条件，公告过期|未过期
-        :return:{'valid':, 'invalid:'}
+        :return:(...)
         """
 
         try:
@@ -76,7 +76,7 @@ class CR(object):
             print(e)
             raise Exception('fail to request!')
 
-    def VoidTheNote(self, pk):
+    def VoidTheNoteRequest(self, pk):
         """
         作废一则公告
         :param pk:主键　可能是一组　用字典对应
@@ -115,7 +115,7 @@ class CR(object):
 
     def ModifyTheNoteRequest(self, data):
         """
-        添加一则新公告
+        修改一则新公告
         :param data:数据
         :return: res['operation'] 即ClientRequest.Sucess | ...
         """
@@ -124,7 +124,83 @@ class CR(object):
             response = self.stub.ModifyTheNote(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
             res = pickle.loads(response.result)
             if res['operation'] == ClientRequest.Failure:
+                raise Exception('fial to modify!')
+            elif res['operation'] == ClientRequest.Success:
+                return ClientRequest.Success
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+
+    # 用户相关
+    def GetAllUserRequest(self, start=None, num=None):
+        """
+        获取所有公告
+        :param start:　限制田间，起始位置
+        :param num:　限制条件，每页条数
+        :return:
+        """
+
+        try:
+            data = {'obj': 'user', 'start': start, 'num': num}
+            response = self.stub.GetAllUsers(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:  # 请求失败
+                return ()
+            elif res['operation'] == ClientRequest.Success:  # 请求成功
+                return res['result']
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+
+    def DeleteTheUserRequest(self, pk):
+        """
+        删除一个用户
+        :param pk:主键　可能是一组　用字典对应
+        :return:res['operation'] 即ClientRequest.Sucess | ...
+        """
+
+        try:
+            data = {'user_id': pk[0]}
+            response = self.stub.DeleteTheUser(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:
+                raise Exception('fial to delete!')
+            elif res['operation'] == ClientRequest.Success:
+                return ClientRequest.Success
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+
+    def InsertAUserRequest(self, data):
+        """
+        添加一个新用户
+        :param data:数据
+        :return: res['operation'] 即ClientRequest.Sucess | ...
+        """
+
+        try:
+            response = self.stub.InsertAUser(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:
                 raise Exception('fial to insert!')
+            elif res['operation'] == ClientRequest.Success:
+                return ClientRequest.Success
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+
+    def ModifyTheUserRequest(self, data):
+        """
+        修改一则用户信息
+        :param data:数据
+        :return: res['operation'] 即ClientRequest.Sucess | ...
+        """
+
+        try:
+            response = self.stub.ModifyTheUser(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:
+                raise Exception('fial to modify!')
             elif res['operation'] == ClientRequest.Success:
                 return ClientRequest.Success
         except Exception as e:  # 界面捕捉异常并弹出警告窗口

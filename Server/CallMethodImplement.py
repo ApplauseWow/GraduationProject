@@ -54,7 +54,7 @@ class CallMethodImplement(object):
     @log
     def GetAllObjects(self, ip, data):
         """
-        获取所有公告
+        获取所有对象
         :param ip: 用于识别客户端
         :param data: 请求参数
         :return: dict{'operation': , 'exception': , 'result': }
@@ -64,7 +64,10 @@ class CallMethodImplement(object):
             conn = DBC(client_ip=ip)
             table = self.__obj2table_mapper[data['obj']]
             start_end = (data['start'], data['num']) if data['num'] else()
-            res = conn.search_record(table=table, start_end=start_end, limitation={'is_valid': data['is_valid']})
+            data.pop('start')
+            data.pop('num')
+            data.pop('obj')
+            res = conn.search_record(table=table, start_end=start_end, limitation=None if data == {} else data)
             res['operation'] = self.__operation_mapper[res['operation']]
             return res
         except Exception as e:
@@ -89,9 +92,9 @@ class CallMethodImplement(object):
             return {'operation':ClientRequest.Failure, 'exception':e, 'result': None}
 
     @log
-    def InsertANote(self ,ip, data):
+    def InsertAObject(self ,ip, data):
         """
-        添加一则新公告
+        添加一则新对象
         :param ip: 用于识别客户端
         :param data: 请求参数
         :return: dict{'operation': , 'exception': , 'result': }
@@ -99,16 +102,18 @@ class CallMethodImplement(object):
 
         try:
             conn = DBC(client_ip=ip)
-            res = conn.modify_record('insert', 'note_info', data)
+            table = self.__obj2table_mapper[data['obj']]
+            data.pop('obj')
+            res = conn.modify_record('insert', table, data)
             res['operation'] = self.__operation_mapper[res['operation']]
             return res
         except Exception as e:
             return {'operation': ClientRequest.Failure, 'exception': e, 'result': None}
 
     @log
-    def ModifyTheNote(self, ip, data):
+    def ModifyTheObject(self, ip, data):
         """
-        修改公告
+        修改对象
         :param ip: 用于识别客户端
         :param data: 请求参数
         :return: dict{'operation': , 'exception': , 'result': }
@@ -116,8 +121,31 @@ class CallMethodImplement(object):
 
         try:
             conn = DBC(client_ip=ip)
-            res = conn.modify_record('update', 'note_info', data)
+            table = self.__obj2table_mapper[data['obj']]
+            data.pop('obj')
+            res = conn.modify_record('update', table, data)
             res['operation'] = self.__operation_mapper[res['operation']]
             return res
         except Exception as e:
             return {'operation': ClientRequest.Failure, 'exception': e, 'result': None}
+
+    @log
+    def DeleteTheObject(self, ip, data):
+        """
+        修改对象
+        :param ip: 用于识别客户端
+        :param data: 请求参数
+        :return: dict{'operation': , 'exception': , 'result': }
+        """
+
+        try:
+            conn = DBC(client_ip=ip)
+            table = self.__obj2table_mapper[data['obj']]
+            data.pop('obj')
+            res = conn.modify_record('delete', table, data)
+            res['operation'] = self.__operation_mapper[res['operation']]
+            return res
+        except Exception as e:
+            return {'operation': ClientRequest.Failure, 'exception': e, 'result': None}
+
+

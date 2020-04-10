@@ -154,6 +154,7 @@ class Page(Pagination):
                 else:  # 普通字段
                     item = QTableWidgetItem(u"{}".format(row[num_c]))  # 注意中文编码
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    print(row[num_c], type(row[num_c]))
                     self.table.setItem(num_r, num_c, item)
 
     def addOperationButton(self, primay_key):
@@ -162,7 +163,7 @@ class Page(Pagination):
         :return:
         """
         widget = QWidget()
-        bt = OperationButtonInTable(name=u'作废')
+        bt = OperationButtonInTable(name=u'删除')
         bt.clicked.connect(lambda : self.operationOnBtClicked(primay_key))
         hLayout = QHBoxLayout()
         hLayout.addWidget(bt)
@@ -256,9 +257,11 @@ class Management(ManagementWindow):
     def __init__(self, user_id, user_type):
         super(Management, self).__init__(user_id, user_type)
         # 添加顺序一定按照按钮顺序
-        self.page_one = self.ShowNotes(user_id=user_id, user_type=user_type)
+        self.page_one = self.ShowUsers(user_id=user_id, user_type=user_type) if UserType(user_type) == UserType.Teacher else self.ShowUsers(user_id=user_id, user_type=user_type)
+        self.page_two = self.ShowNotes(user_id=user_id, user_type=user_type)
 
         self.right_layout.addWidget(self.page_one)
+        self.right_layout.addWidget(self.page_two)
 
         self.setUpConnect()
 
@@ -411,7 +414,7 @@ class Management(ManagementWindow):
                 try:
                     conn = CR()
                     # 更新
-                    res = conn.VoidTheNote(primary_key)
+                    res = conn.VoidTheNoteRequest(primary_key)
                     if res == ClientRequest.Success:
                         alright = Alert(words=u"操作成功！", _type='alright')
                         alright.exec_()
@@ -512,7 +515,6 @@ class Management(ManagementWindow):
                         pass
                 # 弹窗查看
                 note_detail = Management.ShowNotes.ANote(self.user_type, data)
-                note_detail.update_signal.connect(lambda :self.update_signal.emit())
                 note_detail.bt_insert.hide()
                 note_detail.bt_update.hide()
                 note_detail.d_title.setEnabled(False)
@@ -606,6 +608,244 @@ class Management(ManagementWindow):
                     warning.exec_()
                 finally:
                     self.close()
+
+    # ---------------------ShowNote  complete------------------------
+
+    class ShowUsers(StuffTable):
+        """
+        继承StuffTable封装业务逻辑
+        数据需求：所有用户信息
+        描述：【教师】一个用户表格
+        """
+
+        def __init__(self, user_id, user_type):
+            StuffTable.__init__(self)
+            self.user_table = self.UserTable(user_type)
+            self.user_table.update_signal.connect(self.initPage)
+            self.lay.addWidget(self.user_table, 2, 0, 5, 5)
+            self.lay.setRowStretch(1, 1)
+            self.lay.setRowStretch(3, 4)
+            self.lay.setRowStretch(7, 1)
+            self.bt_insert.clicked.connect(lambda: self.createAUserDetail(None))
+
+        def initPage(self):
+            """
+            用于切换页面后的初始化页面，仅初始化必要控件
+            :return: None
+            """
+
+            self.user_table.initializedModel()
+            self.user_table.updateStatus()
+
+        def createAUserDetail(self, data):
+            """
+            创建一个用户信息窗口
+            :return: None
+            """
+
+            win = self.AUser(data)
+            win.update_signal.connect(self.initPage)
+            win.exec_()
+
+        class UserTable(Page):
+            """
+            用户表
+            """
+
+            update_signal = pyqtSignal()
+
+            def __init__(self, user_type):
+                Page.__init__(self)
+                self.user_type = user_type
+                self.col_list = TABLE_COLUMN_DICT[UserType(user_type)]['user']  # 获取表头信息
+                self.initializedModel()
+                self.setUpConnect()
+                self.updateStatus()
+
+            def initializedModel(self):
+                try:
+                    conn = CR()
+                    self.currentPage = 1
+                    self.totalRecordCount = conn.GetCountRequest('user')
+                    conn.CloseChannnel()
+                    if self.totalRecordCount % self.pageRecordCount == 0:
+                        if self.totalRecordCount != 0:
+                            self.totalPage = self.totalRecordCount / self.pageRecordCount
+                        else:
+                            self.totalPage = 1
+                    else:
+                        self.totalPage = int(self.totalRecordCount / self.pageRecordCount) + 1
+                    self.queryRecord(0)
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"查询失败！")
+                    warning.exec_()
+
+            def queryRecord(self, limitIndex):
+                """
+                重写查询记录
+                :param limitIndex:从第limitIndex条开始
+                :return:
+                """
+
+                try:
+                    conn = CR()
+                    users = conn.GetAllUserRequest(start=limitIndex, num=self.pageRecordCount)
+                    self.addRecords(self.col_list, users)
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"查询失败！")
+                    warning.exec_()
+
+            def operationOnBtClicked(self, primary_key):
+                """
+                重写操作按钮
+                :param primary_key: 主键
+                :return: None
+                """
+
+                try:
+                    conn = CR()
+                    # 更新
+                    res = conn.DeleteTheUserRequest(primary_key)
+                    if res == ClientRequest.Success:
+                        alright = Alert(words=u"操作成功！", _type='alright')
+                        alright.exec_()
+                        self.initializedModel()  # 重新刷新页面色
+                        self.updateStatus()
+                        self.update_signal.emit()
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"操作失败！")
+                    warning.exec_()
+
+            def showRecord(self, index):
+                """
+                重写双击记录信号的槽函数
+                :param index: index.row(), index.column()
+                :return:None
+                """
+
+                row = index.row()
+                col = self.table.columnCount()
+                data = {}
+                for c in range(col):
+                    item = self.table.item(row, c)
+                    if isinstance(item, QTableWidgetItem):  # 是数据
+                        data[Index2ColName['user'][c]] = item.text()
+                    else:  # 不是数据
+                        pass
+                # 弹窗查看
+                user_detail = Management.ShowUsers.AUser(data)
+                user_detail.update_signal.connect(lambda: self.update_signal.emit())
+                user_detail.exec_()
+
+        class AUser(StuffDetail):
+            """
+            用户详情 | 添加/修改用户信息
+            """
+
+            update_signal = pyqtSignal()  # 更新用户栏信号
+
+            def __init__(self, data=None):
+                StuffDetail.__init__(self)
+                if not data:  # 插入
+                    self.bt_update.hide()
+                else:  # 查看或者修改
+                    self.bt_insert.hide()
+                    self.d_user_id.setText()
+                    """
+                    待完成...注意None的类型如何显示
+                    """
+
+                self.d_user_type.activated.connect(self.isTeacher)
+                self.bt_insert.clicked.connect(self.CreateNewUser)
+                self.bt_update.clicked.connect(self.ModifyUser)
+                self.bt_close.clicked.connect(self.close)
+
+            def CreateNewUser(self):
+                """
+                创建新公告
+                :return: None
+                """
+
+                data = {
+                    'user_id': int(self.d_user_id.text()),
+                    'user_type': self.d_user_type.currentData(),
+                    'major': self.d_major.text() if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                    'grade': int(self.d_grade.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                    '_class': int(self.d_class.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                    'tel': self.d_tel.text(),
+                    'email': self.d_email.text()
+                }
+                try:
+                    conn = CR()
+                    res = conn.InsertAUserRequest(data)
+                    if res == ClientRequest.Success:
+                        alright = Alert(words=u"操作成功！", _type='alright')
+                        alright.exec_()
+                        self.update_signal.emit()
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"操作失败！")
+                    warning.exec_()
+                finally:
+                    self.close()
+
+            def ModifyUser(self):
+                """
+                修改公告
+                :return:None
+                """
+
+                data = {
+                    'user_id': int(self.d_user_id.text()),
+                    'user_type': self.d_user_type.currentData(),
+                    'major': self.d_major.text() if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                    'grade': int(self.d_grade.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                    '_class': int(self.d_class.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                    'tel': self.d_tel.text(),
+                    'email': self.d_email.text()
+                }
+                try:
+                    conn = CR()
+                    res = conn.ModifyTheUserRequest(data)
+                    if res == ClientRequest.Success:
+                        alright = Alert(words=u"操作成功！", _type='alright')
+                        alright.exec_()
+                        self.update_signal.emit()
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"操作失败！")
+                    warning.exec_()
+                finally:
+                    self.close()
+
+            def isTeacher(self, index):
+                """
+                下拉框根据所选角色类型隐藏班级专业
+                :return:
+                """
+
+                if UserType(self.d_user_type.currentData()) == UserType.Teacher:
+                    self.d_major.clear()
+                    self.d_grade.clear()
+                    self.d_class.clear()
+                    self.d_major.hide()
+                    self.d_grade.hide()
+                    self.d_class.hide()
+                    self.l_grade_class.hide()
+                else:
+                    self.d_major.show()
+                    self.d_grade.show()
+                    self.d_class.show()
+                    self.l_grade_class.show()
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

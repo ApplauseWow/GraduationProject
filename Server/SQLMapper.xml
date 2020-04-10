@@ -1,7 +1,8 @@
 <sql>
     <table name="user_info">
-        <insert>INSERT INTO `user_info` (`user_id`, `grade`, `_class`, `user_type`, `tel`, `email`) VALUES (%(user_id)s, %(grade)s, %(_class)s, %(user_type)s, %(tel)s, %(email)s);</insert>
+        <insert>INSERT INTO `user_info` (`user_id`, `major`, `grade`, `_class`, `user_type`, `tel`, `email`) VALUES (%(user_id)s, %(major)s, %(grade)s, %(_class)s, %(user_type)s, %(tel)s, %(email)s);</insert>
         <delete>DELETE FROM `user_info` WHERE `user_id`=%(user_id)s;</delete>
+        <update>UPDATE `user_info` SET `major`=%(major)s, `grade`=%(grade)s, `_class`=%(_class)s, `user_type`=%(user_type)s, `tel`=%(tel)s, `email`=%(email)s WHERE `user_id`=%(user_id)s;</update>
     </table>
     <table name="achievement_info">
         <insert>INSERT INTO `achievement_info` ( `user_id`, `ach_name`, `ach_type`) VALUES (%(user_id)s, %(ach_name)s, %(ach_type)s);</insert>

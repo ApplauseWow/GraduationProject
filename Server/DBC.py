@@ -57,7 +57,7 @@ class DBC(object):
         :return: dict{'operation':DBOpertion., 'exception': e, 'result':results | None}
         """
 
-        if _type:  # 有筛选要求，仅针对
+        if _type:  # 有筛选要求
             tree = ET.parse(self.sql_mapper)
             root = tree.getroot()
             res = filter(lambda x: x.get('name') == table, root.findall('table'))  # 找到table的sql

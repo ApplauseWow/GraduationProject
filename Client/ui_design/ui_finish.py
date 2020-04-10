@@ -2,7 +2,7 @@
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QDialog, QLabel, QLCDNumber, QGridLayout, QPushButton, \
     QLineEdit, QVBoxLayout, QHBoxLayout, QHeaderView, QMessageBox, QTableWidget, QAbstractItemView, QTableWidgetItem, \
-    QFrame, QStackedLayout, QTextEdit
+    QFrame, QStackedLayout, QTextEdit, QComboBox
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QEvent
 import time
 import re
@@ -495,9 +495,60 @@ class StuffTable(QWidget):
         # 布局
         self.lay = QGridLayout()
         # 添加控件
-
+        self.l_user = QPushButton(u"用户信息")
+        self.l_user.setEnabled(False)
+        self.bt_insert = QPushButton(u'添加新用户')
+        self.lay.addWidget(self.l_user, 0, 0, 2, 1)
+        self.lay.addWidget(self.bt_insert, 0, 4, 2, 1)
         # 最后self添加布局
         self.setLayout(self.lay)
+        self.setUpCSS()
+
+    def setUpCSS(self):
+        """
+        添加样式
+        :return: None
+        """
+
+        self.l_user.setObjectName("user_label")
+        self.bt_insert.setObjectName("bt_insert")
+        self.setStyleSheet('''
+                    QPushButton#user_label{
+                        font: 24px;
+                        color:black;
+                        border:none;
+                        background-color:white;
+                        border-left: 10px solid orange;
+                        border-bottom:2px solid orange;
+                    }
+
+                    QPushButton#bt_insert{
+                        background-color:orange;
+                        border: 2px solid orange;
+                        border-radius:5px;
+                        margin-right:30px;
+                        color:white;
+                        font: bold 18px;
+                    }
+
+                    QPushButton#bt_insert:hover{
+                        background-color:white;
+                        border: 2px solid orange;
+                        border-radius:5px;
+                        margin-right:30px;
+                        color:orange;
+                        font: bold 18px;
+                    }
+
+                    QPushButton#bt_insert:pressed{
+                        background-color:white;
+                        border: 2px solid orange;
+                        border-radius:5px;
+                        margin-right:30px;
+                        color:orange;
+                        font: bold 18px;
+                    }
+                ''')
 
 
 class StuffDetail(QDialog):
@@ -508,6 +559,121 @@ class StuffDetail(QDialog):
 
     def __init__(self):
         QDialog.__init__(self)
+        self.user_layout = QGridLayout()
+        self.l_user_id = QLabel()
+        self.l_user_id.setText(u"学号|工号:")
+        self.l_grade_class = QLabel()
+        self.l_grade_class.setText(u"班级:")
+        self.l_user_type = QLabel()
+        self.l_user_type.setText(u"用户类型")
+        self.l_tel = QLabel()
+        self.l_tel.setText(u"联系电话:")
+        self.l_email = QLabel()
+        self.l_email.setText(u"邮箱地址:")
+        self.d_user_id = QLineEdit()
+        self.d_user_id.setEnabled(False)
+        self.d_major = QLineEdit()
+        self.d_user_type = QComboBox()
+        self.d_user_type.addItem(u"教师", 1)
+        self.d_user_type.addItem(u"学生", 0)
+        self.d_user_type.setCurrentIndex(1)
+        self.d_grade = QLineEdit()
+        self.d_class = QLineEdit()
+        self.d_major = QLineEdit()
+        self.d_tel = QLineEdit()
+        self.d_email = QLineEdit()
+        self.bt_close = QPushButton(u"关闭")
+        self.bt_update = QPushButton(u"修改")
+        self.bt_insert = QPushButton(u"添加")
+
+        self.user_layout.addWidget(self.l_user_id, 0, 0, 1, 1)
+        self.user_layout.addWidget(self.d_user_id, 0, 1, 1, 2)
+        self.user_layout.addWidget(self.l_user_type, 1, 0, 1, 1)
+        self.user_layout.addWidget(self.d_user_type, 1, 1, 1, 1)
+        self.user_layout.addWidget(self.l_grade_class, 2, 0, 1, 1)
+        self.user_layout.addWidget(self.d_grade, 2, 1, 1, 1)
+        self.user_layout.addWidget(self.d_major, 2, 2, 1, 2)
+        self.user_layout.addWidget(self.d_class, 2, 4, 1, 1)
+        self.user_layout.addWidget(self.l_tel, 3, 0, 1, 1)
+        self.user_layout.addWidget(self.d_tel, 3, 1, 1, 3)
+        self.user_layout.addWidget(self.l_email, 4, 0, 1, 1)
+        self.user_layout.addWidget(self.d_email, 4, 1, 1, 3)
+        self.user_layout.addWidget(self.bt_close, 5, 3, 1, 1)
+        self.user_layout.addWidget(self.bt_insert, 5, 2, 1, 1)
+        self.user_layout.addWidget(self.bt_update, 5, 1, 1, 1)
+        self.setLayout(self.user_layout)
+        self.setUpCSS()
+
+    def setUpCSS(self):
+        self.setStyleSheet('''
+            QLabel{
+                background-color:rgba(255,165,0,200);
+                border-style:outset;
+                border-width:4px;
+                border-radius:10px;
+                border-color:rgba(255,255,255,30);
+                font:bold 15px;
+                color:rgb(255,255,255);
+                padding:6px;
+                text-align: center;
+            }
+
+            QPushButton{
+                background-color:orange;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:white;
+                font: bold 18px;
+            }
+
+            QPushButton:hover{
+                background-color:white;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:orange;
+                font: bold 18px;
+            }
+
+            QPushButton:pressed{
+                background-color:white;
+                border: 2px solid orange;
+                border-radius:5px;
+                margin-right:30px;
+                color:orange;
+                font: bold 18px;
+            }
+
+            QLineEdit{
+                background-color:rgba(255,165,0,200);
+                font: bold 15px;
+                height:30px;
+                border-radius:5px;
+                color:white;
+            }
+
+            QTextEdit{
+                background-color:rgba(255,165,0,200);
+                font: bold 18px;
+                height:30px;
+                border-radius:5px;
+                color:white;
+            }
+            
+            QComboBox{
+                background-color:rgba(255,165,0,200);
+                font: bold 18px;
+                height:30px;
+                border-radius:5px;
+                color:white;
+            }
+            
+        ''')
+
+        self.resize(400, 300)
+        self.setAttribute(Qt.WA_TranslucentBackground)  # 窗体背景透明
+        self.setWindowFlags(Qt.FramelessWindowHint)  # 影藏窗口
 
 
 class MyInfo(QWidget):
@@ -906,9 +1072,9 @@ class OperationButtonInTable(QPushButton):
 
 
 if __name__ == '__main__':
-    import numpy as np
-    a = np.array([x for x in range(100)])
-    a = [str(x) for x in a]
-    print(a)
-    b = ",".join(a)
-    print(b)
+    import sys
+    app = QApplication(sys.argv)
+    win = StuffDetail()
+    print(win.d_user_type.currentData(), type(win.d_user_type.currentData()))
+    win.show()
+    sys.exit(app.exec_())

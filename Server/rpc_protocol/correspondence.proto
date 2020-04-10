@@ -15,11 +15,14 @@ service Backend {
     rpc GetRecordsCount(RequestStruct) returns (ResponseStruct) {} //获取记录条数
     // ->->公告相关接口
     rpc GetAllNotes(RequestStruct) returns (ResponseStruct) {} // 教师学生共用，通过角色类型划分权限
-    rpc GetTheNote(RequestStruct) returns (ResponseStruct) {} // 教师学生共用，通过id获取
     rpc InsertANote(RequestStruct) returns (ResponseStruct) {} // 教师专用
     rpc ModifyTheNote(RequestStruct) returns (ResponseStruct) {} // 教师专用
     rpc VoidTheNote(RequestStruct) returns (ResponseStruct) {} // 教师专用
-    // ->->
+    // ->->用户相关接口
+    rpc GetAllUsers(RequestStruct) returns (ResponseStruct) {} // 教师专用
+    rpc DeleteTheUser(RequestStruct) returns (ResponseStruct) {} // 教师专用
+    rpc InsertAUser(RequestStruct) returns (ResponseStruct) {} // 教师专用
+    rpc ModifyTheUser(RequestStruct) returns (ResponseStruct) {} // 教师专用
 
 
 }

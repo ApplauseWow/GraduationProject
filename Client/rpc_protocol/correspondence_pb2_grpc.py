@@ -35,11 +35,6 @@ class BackendStub(object):
         request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
         response_deserializer=correspondence__pb2.ResponseStruct.FromString,
         )
-    self.GetTheNote = channel.unary_unary(
-        '/Backend/GetTheNote',
-        request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
-        response_deserializer=correspondence__pb2.ResponseStruct.FromString,
-        )
     self.InsertANote = channel.unary_unary(
         '/Backend/InsertANote',
         request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
@@ -52,6 +47,26 @@ class BackendStub(object):
         )
     self.VoidTheNote = channel.unary_unary(
         '/Backend/VoidTheNote',
+        request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
+        response_deserializer=correspondence__pb2.ResponseStruct.FromString,
+        )
+    self.GetAllUsers = channel.unary_unary(
+        '/Backend/GetAllUsers',
+        request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
+        response_deserializer=correspondence__pb2.ResponseStruct.FromString,
+        )
+    self.DeleteTheUser = channel.unary_unary(
+        '/Backend/DeleteTheUser',
+        request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
+        response_deserializer=correspondence__pb2.ResponseStruct.FromString,
+        )
+    self.InsertAUser = channel.unary_unary(
+        '/Backend/InsertAUser',
+        request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
+        response_deserializer=correspondence__pb2.ResponseStruct.FromString,
+        )
+    self.ModifyTheUser = channel.unary_unary(
+        '/Backend/ModifyTheUser',
         request_serializer=correspondence__pb2.RequestStruct.SerializeToString,
         response_deserializer=correspondence__pb2.ResponseStruct.FromString,
         )
@@ -91,13 +106,6 @@ class BackendServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def GetTheNote(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
   def InsertANote(self, request, context):
     # missing associated documentation comment in .proto file
     pass
@@ -113,6 +121,34 @@ class BackendServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def VoidTheNote(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def GetAllUsers(self, request, context):
+    """->->用户相关接口
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def DeleteTheUser(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def InsertAUser(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ModifyTheUser(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -142,11 +178,6 @@ def add_BackendServicer_to_server(servicer, server):
           request_deserializer=correspondence__pb2.RequestStruct.FromString,
           response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
       ),
-      'GetTheNote': grpc.unary_unary_rpc_method_handler(
-          servicer.GetTheNote,
-          request_deserializer=correspondence__pb2.RequestStruct.FromString,
-          response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
-      ),
       'InsertANote': grpc.unary_unary_rpc_method_handler(
           servicer.InsertANote,
           request_deserializer=correspondence__pb2.RequestStruct.FromString,
@@ -159,6 +190,26 @@ def add_BackendServicer_to_server(servicer, server):
       ),
       'VoidTheNote': grpc.unary_unary_rpc_method_handler(
           servicer.VoidTheNote,
+          request_deserializer=correspondence__pb2.RequestStruct.FromString,
+          response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
+      ),
+      'GetAllUsers': grpc.unary_unary_rpc_method_handler(
+          servicer.GetAllUsers,
+          request_deserializer=correspondence__pb2.RequestStruct.FromString,
+          response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
+      ),
+      'DeleteTheUser': grpc.unary_unary_rpc_method_handler(
+          servicer.DeleteTheUser,
+          request_deserializer=correspondence__pb2.RequestStruct.FromString,
+          response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
+      ),
+      'InsertAUser': grpc.unary_unary_rpc_method_handler(
+          servicer.InsertAUser,
+          request_deserializer=correspondence__pb2.RequestStruct.FromString,
+          response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
+      ),
+      'ModifyTheUser': grpc.unary_unary_rpc_method_handler(
+          servicer.ModifyTheUser,
           request_deserializer=correspondence__pb2.RequestStruct.FromString,
           response_serializer=correspondence__pb2.ResponseStruct.SerializeToString,
       ),
