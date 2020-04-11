@@ -4,7 +4,7 @@ from ui_design.ui_finish import *
 from TypesEnum import *
 from ClientRequest import CR
 from TableColumnDict import TABLE_COLUMN_DICT
-from ColumnMapper import Index2ColName
+from ColumnMapper import Index2ColName, ColName2Index
 import time
 import datetime
 
@@ -259,7 +259,7 @@ class Management(ManagementWindow):
     def __init__(self, user_id, user_type):
         ManagementWindow.__init__(self, user_id, user_type)
         # 添加顺序一定按照按钮顺序
-        self.page_one = self.ShowUsers(user_id=user_id, user_type=user_type) if UserType(user_type) == UserType.Teacher else self.ShowUsers(user_id=user_id, user_type=user_type)
+        self.page_one = self.ShowUsers(user_id=user_id, user_type=user_type) if UserType(user_type) == UserType.Teacher else self.ShowMyself(user_id=user_id, user_type=user_type)
         self.page_two = self.ShowNotes(user_id=user_id, user_type=user_type)
 
         self.right_layout.addWidget(self.page_one)
@@ -869,7 +869,7 @@ class Management(ManagementWindow):
                 for sz in checks:
                     szText = sz.text()
                     if sz is self.d_major:
-                        pass
+                        szText = szText.strip()  # 去掉头尾空格
                     else:
                         pattern = re.compile('^[0-9]+$')
                         match = pattern.match(szText)
@@ -886,11 +886,119 @@ class Management(ManagementWindow):
                 else:
                     return True
 
+    # ---------------------ShowUsers  complete------------------------
+
+    class ShowMyself(MyselfInfo):
+        """
+        继承MyInfo封装业务逻辑
+        数据需求：个人用户信息
+        描述：【学生】一组标签信息
+        """
+
+        update_signal = pyqtSignal()  # 更新用户信息信号
+
+        def __init__(self, user_id, user_type):
+            MyselfInfo.__init__(self)
+            self.user_id = user_id
+            self.myself_lay.setRowStretch(0, 1)
+            self.myself_lay.setRowStretch(2, 4)
+            self.myself_lay.setRowStretch(10, 3)
+            self.myself_lay.setColumnStretch(0, 1)
+            self.myself_lay.setColumnStretch(9, 2)
+            self.update_signal.connect(self.initPage)
+            self.bt_update.clicked.connect(self.ModifySelfInfo)
+            self.initPage()
+
+        def initPage(self):
+            """
+            用于切换页面后的初始化页面，仅初始化必要控件
+            :return: None
+            """
+
+            try:
+                conn = CR()
+                data = {'user_id': self.user_id}
+                Col2Index = ColName2Index['user']
+                data = conn.GetSelfInfoRequest(data)
+                conn.CloseChannnel()
+                self.d_user_id.setText(str(data[Col2Index['user_id']]))
+                self.d_grade.setText(str(data[Col2Index['grade']]))
+                self.d_major.setText(data[Col2Index['major']])
+                self.d_class.setText(str(data[Col2Index['_class']]))
+                self.d_tel.setText(str(data[Col2Index['tel']]))
+                self.d_email.setText(data[Col2Index['email']])
+                mapper = {UserType.Teacher.value: u"教师", UserType.Student.value: u"学生"}
+                self.d_user_type.setText(mapper[data[Col2Index['user_type']]])
+            except Exception as e:
+                print(e)
+                warning = Alert(words=u"查询失败！")
+                warning.exec_()
+
+        def ModifySelfInfo(self):
+            """
+            修改个人信息
+            :return: None
+            """
+
+            if self.checkInput():
+                mapper = {u"教师": UserType.Teacher.value, u"学生": UserType.Student.value}
+                data = {
+                    'user_id': int(self.d_user_id.text()),
+                    'user_type': mapper[self.d_user_type.text()],
+                    'major': self.d_major.text(),
+                    'grade': int(self.d_grade.text()) ,
+                    '_class': int(self.d_class.text()) ,
+                    'tel': int(self.d_tel.text()) if self.d_tel.text() != "" else None,
+                    'email': self.d_email.text()
+                }
+                try:
+                    conn = CR()
+                    res = conn.ModifyTheUserRequest(data)
+                    if res == ClientRequest.Success:
+                        alright = Alert(words=u"操作成功！", _type='alright')
+                        alright.exec_()
+                        self.update_signal.emit()
+                    conn.CloseChannnel()
+                except Exception as e:
+                    print(e)
+                    warning = Alert(words=u"操作失败！")
+                    warning.exec_()
+            else:  # 非法输入
+                pass
+
+        def checkInput(self):
+            """
+            检查非法输入
+            :return:
+            """
+
+            checks = [self.d_grade, self.d_major, self.d_class, self.d_tel]
+            for sz in checks:
+                szText = sz.text()
+                if sz is self.d_major:
+                    szText = szText.strip()
+                else:
+                    pattern = re.compile('^[0-9]+$')
+                    match = pattern.match(szText)
+                    if not match:
+                        # QMessageBox.information(self, "提示", "请输入数字.")
+                        msg = Alert(words=u"请输入数字")
+                        msg.exec_()
+                        return False
+                if szText == "":
+                    # QMessageBox.information(self, "提示", "请输入跳转页面.")
+                    msg = Alert(words=u"输入不能为空")
+                    msg.exec_()
+                    return False
+            else:
+                return True
+
+    # ---------------------ShowMyself  complete------------------------
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win_ = Management(201610414206, 1)
+    win_ = Management(201610414202, 0)
     win_.show()
     # win1 = SysHome()
     # win2 = MyInfo()

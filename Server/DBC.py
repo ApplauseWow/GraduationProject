@@ -97,7 +97,7 @@ class DBC(object):
             sql = res[0].find('limited_search').text
             limitation['start'] = start_end[0]
             limitation['num'] = start_end[1]
-        elif start_end ==() and limitation:  # 不需要分页，但忧限制要求
+        elif start_end ==() and limitation:  # 不需要分页，但有限制要求
             tree = ET.parse(self.sql_mapper)
             root = tree.getroot()
             res = filter(lambda x: x.get('name') == table, root.findall('table'))  # 找到table的sql
@@ -173,8 +173,9 @@ if __name__ == '__main__':
         # index = a.find('limit')
         # s = a[:index]+';'
         # print(s)
-        print db.search_record('user_info', (0, 8))['result']
-        print str(None)=='None'
+        # print db.search_record('user_info', (0, 8))['result']
+        # print str(None)=='None'
+        print db.search_record('user_info', (), {'user_id': 2})['result']
 
     except Exception as e:
         print(e)

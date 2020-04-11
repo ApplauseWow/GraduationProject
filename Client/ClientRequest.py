@@ -207,6 +207,25 @@ class CR(object):
             print(e)
             raise Exception('fail to request!')
 
+    def GetSelfInfoRequest(self, data):
+        """
+        获取个人用户信息
+        :param data:数据
+        :return: res['operation'] 即ClientRequest.Sucess | ...
+        """
+
+        try:
+            response = self.stub.GetTheUser(correspondence_pb2.RequestStruct(para=pickle.dumps(data)))
+            res = pickle.loads(response.result)
+            if res['operation'] == ClientRequest.Failure:
+                raise Exception('fial to modify!')
+            elif res['operation'] == ClientRequest.Success:
+                return res['result'][0]
+        except Exception as e:  # 界面捕捉异常并弹出警告窗口
+            print(e)
+            raise Exception('fail to request!')
+
+
 if __name__ == '__main__':
     conn = CR()
     print conn.GetAllNotesRequest()

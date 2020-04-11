@@ -14,6 +14,14 @@ Index2ColName = {  # 按照表(对象)分类
     
 }
 
+ColName2Index = {  # 按照表(对象)分类
+
+    'note': {v : k for k, v in Index2ColName['note'].items()},
+
+    'user': {v : k for k, v in Index2ColName['user'].items()}
+
+}
+
 '''
 select GROUP_CONCAT(COLUMN_NAME) from information_schema.COLUMNS where table_name = 'user_info';
 查询字段名称

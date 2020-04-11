@@ -148,4 +148,21 @@ class CallMethodImplement(object):
         except Exception as e:
             return {'operation': ClientRequest.Failure, 'exception': e, 'result': None}
 
+    @log
+    def GetTheObject(self, ip, data):
+        """
+        修改对象
+        :param ip: 用于识别客户端
+        :param data: 请求参数
+        :return: dict{'operation': , 'exception': , 'result': }
+        """
 
+        try:
+            conn = DBC(client_ip=ip)
+            table = self.__obj2table_mapper[data['obj']]
+            data.pop('obj')
+            res = conn.search_record(table=table, start_end=(), limitation=data)
+            res['operation'] = self.__operation_mapper[res['operation']]
+            return res
+        except Exception as e:
+            return {'operation': ClientRequest.Failure, 'exception': e, 'result': None}
