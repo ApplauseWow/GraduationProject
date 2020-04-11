@@ -782,7 +782,7 @@ class Management(ManagementWindow):
                 :return: None
                 """
 
-                if self.checkInpute():
+                if self.checkInput():
                     data = {
                         'user_id': int(self.d_user_id.text()),
                         'user_type': self.d_user_type.currentData(),
@@ -815,7 +815,7 @@ class Management(ManagementWindow):
                 :return:None
                 """
 
-                if self.checkInpute():
+                if self.checkInput():
                     data = {
                         'user_id': int(self.d_user_id.text()),
                         'user_type': self.d_user_type.currentData(),
@@ -859,13 +859,13 @@ class Management(ManagementWindow):
                     self.d_class.show()
                     self.l_grade_class.show()
 
-            def checkInpute(self):
+            def checkInput(self):
                 """
                 检查非法输入
                 :return:
                 """
 
-                checks = [self.d_user_id, self.d_grade, self.d_major, self.d_class] if UserType(self.d_user_type.currentData()) == UserType.Student else [self.d_user_id]
+                checks = [self.d_user_id, self.d_grade, self.d_major, self.d_class, self.d_tel] if UserType(self.d_user_type.currentData()) == UserType.Student else [self.d_user_id, self.d_tel]
                 for sz in checks:
                     szText = sz.text()
                     if sz is self.d_major:
