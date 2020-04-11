@@ -173,7 +173,9 @@ if __name__ == '__main__':
         # index = a.find('limit')
         # s = a[:index]+';'
         # print(s)
-        print db.search_record('note_info', (0, 8), {'is_valid':0})['result']
+        print db.search_record('user_info', (0, 8))['result']
+        print str(None)=='None'
+
     except Exception as e:
         print(e)
 

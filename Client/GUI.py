@@ -152,9 +152,11 @@ class Page(Pagination):
                 if col['name'] == u'操作':  # 操作栏
                     self.table.setCellWidget(num_r, num_c, self.addOperationButton(pk))
                 else:  # 普通字段
-                    item = QTableWidgetItem(u"{}".format(row[num_c]))  # 注意中文编码
+                    if col.has_key('convert'):
+                        item = QTableWidgetItem(u"{}".format(col['convert'](row[num_c])))
+                    else:
+                        item = QTableWidgetItem(u"{}".format(row[num_c] if row[num_c] else ""))  # 注意中文编码
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                    print(row[num_c], type(row[num_c]))
                     self.table.setItem(num_r, num_c, item)
 
     def addOperationButton(self, primay_key):
@@ -255,7 +257,7 @@ class Management(ManagementWindow):
     """
 
     def __init__(self, user_id, user_type):
-        super(Management, self).__init__(user_id, user_type)
+        ManagementWindow.__init__(self, user_id, user_type)
         # 添加顺序一定按照按钮顺序
         self.page_one = self.ShowUsers(user_id=user_id, user_type=user_type) if UserType(user_type) == UserType.Teacher else self.ShowUsers(user_id=user_id, user_type=user_type)
         self.page_two = self.ShowNotes(user_id=user_id, user_type=user_type)
@@ -734,7 +736,11 @@ class Management(ManagementWindow):
                 for c in range(col):
                     item = self.table.item(row, c)
                     if isinstance(item, QTableWidgetItem):  # 是数据
-                        data[Index2ColName['user'][c]] = item.text()
+                        if Index2ColName['user'][c] == 'user_type':
+                            mapper = {u"教师":UserType.Teacher.value, u"学生":UserType.Student.value}
+                            data[Index2ColName['user'][c]] = mapper[item.text()]
+                        else:
+                            data[Index2ColName['user'][c]] = item.text()
                     else:  # 不是数据
                         pass
                 # 弹窗查看
@@ -753,12 +759,17 @@ class Management(ManagementWindow):
                 StuffDetail.__init__(self)
                 if not data:  # 插入
                     self.bt_update.hide()
+                    self.d_user_id.setEnabled(True)
                 else:  # 查看或者修改
                     self.bt_insert.hide()
-                    self.d_user_id.setText()
-                    """
-                    待完成...注意None的类型如何显示
-                    """
+                    self.d_user_id.setText(data['user_id'])
+                    self.d_major.setText(data['major'])
+                    self.d_user_type.setCurrentIndex(data['user_type'])
+                    self.d_grade.setText(data['grade'])
+                    self.d_class.setText(data['_class'])
+                    self.d_tel.setText(data['tel'])
+                    self.d_email.setText(data['email'])
+                    self.isTeacher(None)
 
                 self.d_user_type.activated.connect(self.isTeacher)
                 self.bt_insert.clicked.connect(self.CreateNewUser)
@@ -771,29 +782,32 @@ class Management(ManagementWindow):
                 :return: None
                 """
 
-                data = {
-                    'user_id': int(self.d_user_id.text()),
-                    'user_type': self.d_user_type.currentData(),
-                    'major': self.d_major.text() if UserType(self.d_user_type.currentData()) == UserType.Student else None,
-                    'grade': int(self.d_grade.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
-                    '_class': int(self.d_class.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
-                    'tel': self.d_tel.text(),
-                    'email': self.d_email.text()
-                }
-                try:
-                    conn = CR()
-                    res = conn.InsertAUserRequest(data)
-                    if res == ClientRequest.Success:
-                        alright = Alert(words=u"操作成功！", _type='alright')
-                        alright.exec_()
-                        self.update_signal.emit()
-                    conn.CloseChannnel()
-                except Exception as e:
-                    print(e)
-                    warning = Alert(words=u"操作失败！")
-                    warning.exec_()
-                finally:
-                    self.close()
+                if self.checkInpute():
+                    data = {
+                        'user_id': int(self.d_user_id.text()),
+                        'user_type': self.d_user_type.currentData(),
+                        'major': self.d_major.text() if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                        'grade': int(self.d_grade.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                        '_class': int(self.d_class.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                        'tel': int(self.d_tel.text()) if self.d_tel.text() != "" else None,
+                        'email': self.d_email.text()
+                    }
+                    try:
+                        conn = CR()
+                        res = conn.InsertAUserRequest(data)
+                        if res == ClientRequest.Success:
+                            alright = Alert(words=u"操作成功！", _type='alright')
+                            alright.exec_()
+                            self.update_signal.emit()
+                        conn.CloseChannnel()
+                    except Exception as e:
+                        print(e)
+                        warning = Alert(words=u"操作失败！")
+                        warning.exec_()
+                    finally:
+                        self.close()
+                else:  # 非法输入
+                    pass
 
             def ModifyUser(self):
                 """
@@ -801,29 +815,32 @@ class Management(ManagementWindow):
                 :return:None
                 """
 
-                data = {
-                    'user_id': int(self.d_user_id.text()),
-                    'user_type': self.d_user_type.currentData(),
-                    'major': self.d_major.text() if UserType(self.d_user_type.currentData()) == UserType.Student else None,
-                    'grade': int(self.d_grade.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
-                    '_class': int(self.d_class.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
-                    'tel': self.d_tel.text(),
-                    'email': self.d_email.text()
-                }
-                try:
-                    conn = CR()
-                    res = conn.ModifyTheUserRequest(data)
-                    if res == ClientRequest.Success:
-                        alright = Alert(words=u"操作成功！", _type='alright')
-                        alright.exec_()
-                        self.update_signal.emit()
-                    conn.CloseChannnel()
-                except Exception as e:
-                    print(e)
-                    warning = Alert(words=u"操作失败！")
-                    warning.exec_()
-                finally:
-                    self.close()
+                if self.checkInpute():
+                    data = {
+                        'user_id': int(self.d_user_id.text()),
+                        'user_type': self.d_user_type.currentData(),
+                        'major': self.d_major.text() if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                        'grade': int(self.d_grade.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                        '_class': int(self.d_class.text()) if UserType(self.d_user_type.currentData()) == UserType.Student else None,
+                        'tel': int(self.d_tel.text()) if self.d_tel.text() != "" else None,
+                        'email': self.d_email.text()
+                    }
+                    try:
+                        conn = CR()
+                        res = conn.ModifyTheUserRequest(data)
+                        if res == ClientRequest.Success:
+                            alright = Alert(words=u"操作成功！", _type='alright')
+                            alright.exec_()
+                            self.update_signal.emit()
+                        conn.CloseChannnel()
+                    except Exception as e:
+                        print(e)
+                        warning = Alert(words=u"操作失败！")
+                        warning.exec_()
+                    finally:
+                        self.close()
+                else:  # 非法输入
+                    pass
 
             def isTeacher(self, index):
                 """
@@ -832,9 +849,6 @@ class Management(ManagementWindow):
                 """
 
                 if UserType(self.d_user_type.currentData()) == UserType.Teacher:
-                    self.d_major.clear()
-                    self.d_grade.clear()
-                    self.d_class.clear()
                     self.d_major.hide()
                     self.d_grade.hide()
                     self.d_class.hide()
@@ -844,6 +858,33 @@ class Management(ManagementWindow):
                     self.d_grade.show()
                     self.d_class.show()
                     self.l_grade_class.show()
+
+            def checkInpute(self):
+                """
+                检查非法输入
+                :return:
+                """
+
+                checks = [self.d_user_id, self.d_grade, self.d_major, self.d_class] if UserType(self.d_user_type.currentData()) == UserType.Student else [self.d_user_id]
+                for sz in checks:
+                    szText = sz.text()
+                    if sz is self.d_major:
+                        pass
+                    else:
+                        pattern = re.compile('^[0-9]+$')
+                        match = pattern.match(szText)
+                        if not match:
+                            # QMessageBox.information(self, "提示", "请输入数字.")
+                            msg = Alert(words=u"请输入数字")
+                            msg.exec_()
+                            return False
+                    if szText == "":
+                        # QMessageBox.information(self, "提示", "请输入跳转页面.")
+                        msg = Alert(words=u"输入不能为空")
+                        msg.exec_()
+                        return False
+                else:
+                    return True
 
 
 
